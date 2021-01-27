@@ -9,6 +9,8 @@ dependencies:
   - jupyterlab
   - matplotlib
   - pandas
+  - numpy
+  - numba
   - pip
   - pytask>=0.0.11
   - pytask-latex>=0.0.10

@@ -1,0 +1,18 @@
+{
+  "covid_data_2020_12": [
+    "covid_vaccine_safe",
+    "covid_vaccine_effective",
+    "covid_health_concern",
+    "p_2m_infected"
+  ],
+  "politics_values": [
+    "confidence_science",
+    "confidence_media"
+  ],
+  "covid_data_2020_03": [
+    "trust_gov",
+    "subj_effect_measures",
+    "effect_mask",
+    "effect_wash_hands"
+  ]
+}

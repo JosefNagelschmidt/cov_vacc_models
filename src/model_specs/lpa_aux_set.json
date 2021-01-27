@@ -1,0 +1,23 @@
+{
+  "aux_var_set": [
+    "vaccine_intention_jan",
+    "vaccine_intention_jul",
+    "covid_test_comply",
+    "how_rightwing",
+    "compliance_measures",
+    "location_urban",
+    "happy_month",
+    "nervous_month",
+    "depressed_month",
+    "calm_month",
+    "gloomy_month",
+    "net_income",
+    "age",
+    "edu_4",
+    "support_current_measures",
+    "support_possible_measures",
+    "loneliness",
+    "concerns",
+    "gender_male"
+  ]
+}

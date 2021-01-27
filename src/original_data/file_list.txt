@@ -1,0 +1,17 @@
+Please add the following files to your local copy of this repo for replication:
+
+from: liss-data-covid-19
+(https://gitlab.iame.uni-bonn.de/ose/coronav/liss-data-covid-19)
+
+covid_data_2020_12.pickle
+covid_data_2020_09.pickle
+covid_data_2020_06.pickle
+covid_data_2020_05.pickle
+covid_data_2020_04.pickle
+covid_data_2020_03.pickle
+background_data_merged.pickle
+
+from: liss-data
+(https://gitlab.iame.uni-bonn.de/hmg/liss-data)
+
+politics_values.pickle (generated file in "bld")
