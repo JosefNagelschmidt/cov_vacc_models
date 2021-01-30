@@ -2,13 +2,12 @@
   "n_profiles": [
     3,
     4,
-    5,
-    6
+    5
   ],
   "variances": "equal",
   "covariances": [
     "zero",
     "equal"
   ],
-  "rounds": 5
+  "rounds": 1
 }

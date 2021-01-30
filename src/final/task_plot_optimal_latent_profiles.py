@@ -10,12 +10,12 @@ model_names = ["1", "2", "3", "4"]
 
 specs = [
     {
-        "r": Path("real_data_lpa_estimator.r"),
+        "r": Path("lpa_optimal_params_plot.r"),
         "deps": [
-            SRC / "model_specs" / "lpa_estimator_specs.json",
+            SRC / "model_specs" / f"lpa_optimal_params_set_{model_name}.json",
             BLD / "data" / f"lpa_df_var_subset_{model_name}.csv",
         ],
-        "result": BLD / "analysis" / f"lpa_var_set_{model_name}_performance.csv",
+        "result": BLD / "figures" / f"lpa_var_set_{model_name}_profile_plot.pdf",
     }
     for model_name in model_names
 ]
