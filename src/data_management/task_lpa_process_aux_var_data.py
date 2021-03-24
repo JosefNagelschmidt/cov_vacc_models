@@ -7,7 +7,7 @@ from src.config import BLD
 from src.config import SRC
 
 
-def clean_data(
+def clean_aux_data(
     covid_data_2020_12,
     covid_data_2020_03,
     covid_data_2020_04,
@@ -15,6 +15,33 @@ def clean_data(
     background_data,
     political_data,
 ):
+    """Function to be called by `task_lpa_process_aux_var_data`. Cleans and then returns the input data files.
+
+    Args:
+        covid_data_2020_12 (pd.DataFrame): the dataframe from the pickle file
+            named *covid_data_2020_12.pickle*  (preprocessed data from a LISS questionnaire)
+        covid_data_2020_03 (pd.DataFrame): the dataframe from the pickle file
+            named *covid_data_2020_03.pickle*  (preprocessed data from a LISS questionnaire)
+        covid_data_2020_04 (pd.DataFrame): the dataframe from the pickle file
+            named *covid_data_2020_04.pickle*  (preprocessed data from a LISS questionnaire)
+        covid_data_2020_05 (pd.DataFrame): the dataframe from the pickle file
+            named *covid_data_2020_05.pickle*  (preprocessed data from a LISS questionnaire)
+        background_data (pd.DataFrame): the dataframe from the pickle file
+            named *background_data_merged.pickle*  (preprocessed data from a LISS questionnaire)
+        political_data (pd.DataFrame): the dataframe from the pickle file
+            named *politics_values.pickle* (preprocessed data from a LISS questionnaire)
+
+    Returns:
+        list: list containing:
+
+            **covid_data_2020_12_cleaned** (*pd.DataFrame*): cleaned version of *covid_data_2020_12* \n
+            **covid_data_2020_03_cleaned** (*pd.DataFrame*): cleaned version of *covid_data_2020_03*  \n
+            **covid_data_2020_04_cleaned** (*pd.DataFrame*): cleaned version of *covid_data_2020_04* \n
+            **covid_data_2020_05_cleaned** (*pd.DataFrame*): cleaned version of *covid_data_2020_05*  \n
+            **political_data_cleaned** (*pd.DataFrame*): cleaned version of *political_data* \n
+            **background_data_cleaned** (*pd.DataFrame*): cleaned version of *background_data*
+
+    """
 
     # change indeces (drop month):
     covid_data_2020_12.index = covid_data_2020_12.index.droplevel(1)
@@ -343,7 +370,7 @@ def clean_data(
     ]
 
 
-def merge_subsets(
+def merge_aux_subsets(
     covid_data_2020_12_cleaned,
     covid_data_2020_03_cleaned,
     covid_data_2020_04_cleaned,
@@ -351,6 +378,30 @@ def merge_subsets(
     background_data_cleaned,
     political_data_cleaned,
 ):
+
+    """Function to be called by `task_lpa_process_aux_var_data`. Reads in the cleaned dataframes passed
+    by *clean_aux_data* and merges them.
+
+    Args:
+        covid_data_2020_12_cleaned (pd.DataFrame): cleaned version of *covid_data_2020_12*,
+            passed by function *clean_aux_data*
+        covid_data_2020_03_cleaned (pd.DataFrame): cleaned version of *covid_data_2020_03*,
+            passed by function *clean_aux_data*
+        covid_data_2020_04_cleaned (pd.DataFrame): cleaned version of *covid_data_2020_04*,
+            passed by function *clean_aux_data*
+        covid_data_2020_05_cleaned (pd.DataFrame): cleaned version of *covid_data_2020_05*,
+            passed by function *clean_aux_data*
+        background_data_cleaned (pd.DataFrame): cleaned version of *background_data*,
+            passed by function *clean_aux_data*
+        political_data_cleaned (pd.DataFrame): cleaned version of *political_data*,
+            passed by function *clean_aux_data*
+
+
+    Returns:
+        df_final_cleaned (pd.DataFrame): Merged df of the cleaned input dataframes
+
+    """
+
     dfs = [
         covid_data_2020_12_cleaned,
         covid_data_2020_03_cleaned,
@@ -394,7 +445,7 @@ def task_lpa_create_partial_dfs(depends_on, produces):
         covid_data_2020_05_cleaned,
         political_data_cleaned,
         background_data_cleaned,
-    ) = clean_data(
+    ) = clean_aux_data(
         covid_data_2020_12=covid_data_2020_12,
         covid_data_2020_03=covid_data_2020_03,
         covid_data_2020_04=covid_data_2020_04,
@@ -402,7 +453,7 @@ def task_lpa_create_partial_dfs(depends_on, produces):
         background_data=background_data,
         political_data=political_data,
     )
-    df_final_cleaned = merge_subsets(
+    df_final_cleaned = merge_aux_subsets(
         covid_data_2020_12_cleaned=covid_data_2020_12_cleaned,
         covid_data_2020_03_cleaned=covid_data_2020_03_cleaned,
         covid_data_2020_04_cleaned=covid_data_2020_04_cleaned,

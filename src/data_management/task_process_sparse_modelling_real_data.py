@@ -9,7 +9,7 @@ from src.config import BLD
 from src.config import SRC
 
 
-def clean_data(
+def clean_sparse_data(
     covid_data_2020_12,
     covid_data_2020_03,
     covid_data_2020_04,
@@ -21,6 +21,36 @@ def clean_data(
     add_profession,
     add_political,
 ):
+
+    """Function to be called by `task_process_sparse_modelling_real_data`. Cleans and then returns subsets of the input data files.
+
+    Args:
+        covid_data_2020_12 (pd.DataFrame): the df from the file
+            named *covid_data_2020_12.pickle* (preprocessed data from a LISS questionnaire)
+        covid_data_2020_03 (pd.DataFrame): the df from the file
+            named *covid_data_2020_03.pickle* (preprocessed data from a LISS questionnaire)
+        covid_data_2020_04 (pd.DataFrame): the df from the file
+            named *covid_data_2020_04.pickle* (preprocessed data from a LISS questionnaire)
+        covid_data_2020_05 (pd.DataFrame): the df from the file
+            named *covid_data_2020_05.pickle* (preprocessed data from a LISS questionnaire)
+        covid_data_2020_06 (pd.DataFrame): the df from the file
+            named *covid_data_2020_06.pickle* (preprocessed data from a LISS questionnaire)
+        covid_data_2020_09 (pd.DataFrame): the df from the file
+            named *covid_data_2020_09.pickle* (preprocessed data from a LISS questionnaire)
+        background_data (pd.DataFrame): the df from the file
+            named *background_data_merged.pickle* (preprocessed data from a LISS questionnaire)
+        political_data (pd.DataFrame): the df from the file
+            named *politics_values.pickle* (preprocessed data from a LISS questionnaire)
+        add_profession (str): *yes*, if the variable *profession* from the LISS
+            dataset *background_data_merged.pickle* should be used; *no* if not
+        add_political (str): *yes*, if the variables (*news_interest*,*political_interest*,*parties_not_care*,
+            *ppl_no_influence*,*politically_able*,*understand_pol_issues*,*how_rightwing*) from the
+            LISS dataset *politics_values.pickle* should be used; *no* if not
+
+    Returns:
+        df_final_cleaned (pd.DataFrame): the resulting df after cleaning each of the input dfs and merging them
+
+    """
 
     # change indeces (drop month):
     covid_data_2020_12.index = covid_data_2020_12.index.droplevel(1)
@@ -897,7 +927,7 @@ def task_process_sparse_modelling_real_data(case, depends_on, produces):
     background_data = pd.read_pickle(depends_on["background_data"])
     political_data = pd.read_pickle(depends_on["politics_values"])
 
-    df_final_cleaned = clean_data(
+    df_final_cleaned = clean_sparse_data(
         covid_data_2020_12=covid_data_2020_12,
         covid_data_2020_03=covid_data_2020_03,
         covid_data_2020_04=covid_data_2020_04,

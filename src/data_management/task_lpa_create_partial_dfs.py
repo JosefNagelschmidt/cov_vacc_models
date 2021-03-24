@@ -9,6 +9,21 @@ from src.config import SRC
 
 
 def scaler(x, lower, upper, df, column_name):
+
+    """Helper function that rescales a value *x* to a certain range, as specified by the max- and min
+    values of a column in the dataframe from which *x* originates. This is useful in latent profile analysis and subsequent steps.
+
+    Args:
+        x (float): element that is to be rescaled to a different range
+        lower (float): lower bound of the new range
+        upper (float): upper bound of the new range
+        df (pd.Dataframe): df containing the column from which *x* originated
+        column_name (str): column name in *df* from which *x* is drawn
+
+    Returns:
+        (float): rescaled value of *x*
+    """
+
     if pd.isnull(x):
         return x
     else:
@@ -19,6 +34,25 @@ def scaler(x, lower, upper, df, column_name):
 
 
 def clean_data(covid_data_2020_12, covid_data_2020_03, political_data):
+
+    """Function to be called by `task_lpa_create_partial_dfs`. Cleans and then returns the input data files.
+
+    Args:
+        covid_data_2020_12 (pd.DataFrame): the dataframe from the pickle
+            file named *covid_data_2020_12.pickle*  (preprocessed data from a LISS questionnaire)
+        covid_data_2020_03 (pd.DataFrame): the dataframe from the pickle
+            file named *covid_data_2020_03.pickle*  (preprocessed data from a LISS questionnaire)
+        political_data (pd.DataFrame): the dataframe from the pickle
+            file named *politics_values.pickle* (preprocessed data from a LISS questionnaire)
+
+    Returns:
+        list: list containing:
+
+            **covid_data_2020_12_cleaned** (*pd.DataFrame*): cleaned version of *covid_data_2020_12* \n
+            **covid_data_2020_03_cleaned** (*pd.DataFrame*): cleaned version of *covid_data_2020_03*  \n
+            **political_data_select** (*pd.DataFrame*): cleaned version of *political_data*
+
+    """
 
     # change indeces (drop month):
     covid_data_2020_12.index = covid_data_2020_12.index.droplevel(1)
@@ -170,6 +204,25 @@ def merge_subsets(
     political_data_select,
     var_set,
 ):
+
+    """Function to be called by `task_lpa_create_partial_dfs`. Reads in pre-specified columns of
+    the input dataframes (as defined by *var_set*) and merges them.
+
+    Args:
+        covid_data_2020_12_cleaned (pd.DataFrame): cleaned version
+            of *covid_data_2020_12*, passed by function *clean_data*
+        covid_data_2020_03_cleaned (pd.DataFrame): cleaned version
+            of *covid_data_2020_03*, passed by function *clean_data*
+        political_data_select (pd.DataFrame): cleaned version
+            of *political_data*, passed by function *clean_data*
+        var_set (dict): dict containing a list for each of the three input dataframes,
+            which in turn contains names (*str*) of the relevant column names
+
+    Returns:
+        df_final_cleaned (pd.DataFrame): Merged df of the pre-specified columns of the input dataframes
+
+    """
+
     covid_data_2020_12_subset = covid_data_2020_12_cleaned[
         var_set["covid_data_2020_12"]
     ]
