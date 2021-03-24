@@ -1,55 +1,27 @@
 import numpy as np
 import pytest
-from sklearn.linear_model import Lasso
 
 from .estimators import active_set_lasso
 from .estimators import eps_thresh_lasso
 from .estimators import eps_thresh_lasso_warm_start
-from .estimators import get_lamda_path_numba
 from .estimators import lasso_numba
 from .estimators import naive_lasso
-
-
-def sk_learn_lasso(X, y, intercept=True, lamda_path=None):
-
-    m, p = X.shape
-
-    x_mean = X.mean(axis=0)
-    x_std = X.std(axis=0)
-
-    y_mean = np.mean(y)
-    y_std = np.std(y)
-
-    X_std = (X - x_mean) / x_std
-    y_std = (y - y_mean) / y_std
-
-    if lamda_path is None:
-        path = get_lamda_path_numba(X=X_std, y=y_std)
-    else:
-        path = lamda_path
-
-    y_std = y_std.flatten()
-
-    lamdas = []
-    coeffs = []
-
-    for lamda in path:
-        reg = Lasso(alpha=lamda, fit_intercept=intercept)
-        reg.fit(X_std, y_std)
-
-        if intercept:
-            coef = np.insert(arr=reg.coef_, obj=0, values=reg.intercept_)
-        else:
-            coef = reg.coef_
-
-        lamdas.append(lamda)
-        coeffs.append(np.copy(coef))
-
-    return lamdas, coeffs
+from .external_estimators import sk_learn_lasso
 
 
 @pytest.fixture
 def setup_p_less_n_data():
+
+    """Creating a DGP where the regressor matrix X has less regressors (columns) than observations (rows).
+
+    Args:
+
+    Returns:
+        dict: dict containing:
+            **X** (*np.ndarray*): generated regressor matrix *X* (sample data) for testing \n
+            **y** (*np.ndarray*): generated vector of dependent variable values *y*
+
+    """
 
     np.random.seed(seed=1)
     X = np.random.rand(100, 50)
@@ -63,6 +35,17 @@ def setup_p_less_n_data():
 @pytest.fixture
 def setup_p_larger_n_data():
 
+    """Creating a DGP where the regressor matrix X has more regressors (columns) than observations (rows).
+
+    Args:
+
+    Returns:
+        dict: dict containing:
+            **X** (*np.ndarray*): generated regressor matrix *X* (sample data) for testing \n
+            **y** (*np.ndarray*): generated vector of dependent variable values *y*
+
+    """
+
     np.random.seed(seed=1)
     X = np.random.rand(50, 100)
     y = np.array(
@@ -73,6 +56,7 @@ def setup_p_larger_n_data():
 
 
 def test_naive_lasso_p_less_n(setup_p_less_n_data):
+
     X = setup_p_less_n_data["X"]
     y = setup_p_less_n_data["y"]
 
