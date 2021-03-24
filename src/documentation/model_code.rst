@@ -4,13 +4,41 @@
 Model code
 **********
 
-The directory *src.model_code* contains source files that might differ by model and which are potentially used at various steps of the analysis.
+This directory contains most code related to the simulation study for the scientific computing course.
+It specifies functions for the data generating processes, my own implementation of the lasso and the adaptive lasso,
+and competing post-model-selection inference estimators based on sample splitting.
+Additionally, some benchmark metrics are specified.
 
-For example, you may have a class that is used both in the :ref:`analysis` and the :ref:`final` steps. Additionally, maybe you have different utility functions in the baseline version and for your robustness check. You can just inherit from the baseline class and override the utility function then.
+The data generating processes in the simulations
+================================================
 
-The ``Agent`` class of the Schelling example
-============================================
-
-.. automodule:: src.model_code.agent
+.. automodule:: src.model_code.dgp
     :members:
 
+
+The custom lasso and adaptive lasso implementation
+==================================================
+
+.. automodule:: src.model_code.estimators
+    :members:
+
+
+External estimators used as benchmarks
+======================================
+
+.. automodule:: src.model_code.external_estimators
+    :members:
+
+
+Performance metrics
+===================
+
+.. automodule:: src.model_code.helpers
+    :members:
+
+
+Unit tests of custom implementation
+===================================
+
+.. automodule:: src.model_code.test_estimators
+    :members:

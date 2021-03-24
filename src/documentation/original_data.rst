@@ -4,8 +4,6 @@
 Original data
 *************
 
-Documentation of the different datasets in *original_data*.
 
-In the original data section you would store the raw data, which you should not manipulate to ensure reproducibility.
-
-If you want to include multiple data sets, you can also create subfolders for the sake of a clear structure.
+- `file_list.txt` specifies all the relevant raw datasets that are used in this project.
+- If you have access to those, you can replicate this study by moving the files from `file_list.txt` into this directory, before running any tasks.
