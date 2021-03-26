@@ -16,7 +16,7 @@ df <- df[ , -which(names(df) %in% c("personal_id"))]
 
 
 output = data.frame(matrix(nrow=0, ncol=18))
-# train the optimal models (change ""n_profiles" and "models" depending on output above)
+# train a mixed gaussian models for each combination of estimator_specs
 for (n_profiles in estimator_specs$n_profiles){
   for (cov in estimator_specs$covariances){
     estimated_model = df %>%
