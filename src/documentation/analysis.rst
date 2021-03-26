@@ -1,8 +1,8 @@
 .. _analysis:
 
-***********************
-Analysis and core tasks
-***********************
+********
+Analysis
+********
 
 Documentation of the code in *src.analysis*.
 

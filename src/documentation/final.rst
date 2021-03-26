@@ -30,7 +30,8 @@ The corresponding files are:
 Scientific computing benchmarking
 =================================
 
-The results of the simulation study, as well as an glimpse into the process of developing a lasso implementation (via coordinate descent) are summarized in two jupyter notebooks.
+The results of the simulation study, as well as an glimpse into the process of developing a lasso
+implementation (via coordinate descent) are summarized in two jupyter notebooks.
 
 The corresponding files are:
 
