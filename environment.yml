@@ -16,7 +16,7 @@ dependencies:
   - pytask-latex>=0.0.10
   - pytask-r>=0.0.6
   - scikit-learn
-
+  - statsmodels
 
   - pytest
   - pytest-cov
@@ -34,4 +34,5 @@ dependencies:
     - sphinx-autobuild
     - sphinx-rtd-theme
     - sphinxcontrib-bibtex
+    - boruta
 

@@ -24,16 +24,11 @@ Some information for building this project:
 - For the python part, the project makes use of a conda environment, as specified in the ``environment.yml``. To create an equivalent new conda environment on your local machine, run ``conda env create --name my_local_env_name --file=environment.yml`` in the root of the cloned repository.
 - You have to activate the conda environment and run ``conda develop .`` before proceeding.
 - In order to replicate all parts of this project, you will need an R interpreter in version 4.0.4, and the *renv* package installed, since it manages the R dependencies needed for this project, which means the ``renv.lock`` records the exact versions of R packages used (``https://rstudio.github.io/renv/articles/renv.html``). Afer cloning the repository, navigate to the root of the project and open the R interpreter in the terminal.
-- Then type ``library("renv")`` to load the package (or ``install.packages("renv")`` if not installed yet), and subsequently `renv::init()` to automatically install the packages declared in ``renv.lock`` into your own private project library.
+- Then type ``library("renv")`` to load the package (or ``install.packages("renv")`` if not installed yet), and subsequently ``renv::init(bare = TRUE)`` and ``renv::restore()`` to automatically install the packages declared in ``renv.lock`` into your own private project library.
+- You will also need to import the files that are specified within ``./src/original_data/file_list.txt`` into the folder ``./src/original_data/``.
 - Since I am following the ``Gaudecker, H. M. V. (2014). Templates for reproducible research projects in economics`` template, I am also making use of the `pytask` build system. After having set up your conda environment and your R environment, you should be able to run `pytask` in a terminal opened in the root of the project.
-- This will build all necessary files. Since some of the tasks have a long runtime, they are skipped by default. If you want to run those, this is possible by removing the ``@pytask.mark.skip`` annotations in the source files. The following tasks are skipped by default:
-
-1. ``./src/analysis/task_sim_data_benchmarking.py``
-2. ``./src/analysis/task_sim_real_data_benchmarking.py``
-3. ``./src/analysis/task_lpa_analysis.py``
-4. ``./src/data_management/task_lpa_get_optimal_params.py``
-
-To understand what these four tasks are doing, have a look into the relevant section of the documentation.
-
-- If you, however, would like to replicate the full project, you might consider setting the ``number_simulations`` variable (in the two first tasks above) to a lower number to save time.
-- To make it easier to access the final results, also without running all tasks (including the four above), I have added the necessary final outputs into the ``./src/final`` folder as well. So if you do not want to run all the tasks and just have a look at the results, then you can just open the respective notebook within ``./src/final``, which by default loads the final outputs from the same folder.
+- If you are just interested in the results, you do not have to bother yourself with pytask. However, if full replication is the goal, running pytask is necessary. In this case, have a look into the file ``pytask.ini`` in the root of the project. You will see there that some of the tasks are skipped / ignored by default, due to their long runtime. If you want to run those, this is possible by commenting out the respective lines.
+- To understand what each task is doing, have a look into the relevant section of the documentation.
+- Running the tasks that are not ignored by default takes me around 3 minutes (Ubuntu 20.04, CPU: Ryzen 9 5950X with 32 Threads at 3.4GHz Base Clock)
+- You might consider setting the ``number_simulations`` variable in ``src/analysis/task_sim_real_data_benchmarking.py`` and ``src/analysis/task_sim_data_benchmarking.py`` to a lower number, if you decide to run those, to save time.
+- To make it easier to access the final results, also without running all tasks, I have added the necessary final outputs into the ``./src/final`` folder as well. So if you do not want to run all the tasks and just have a look at the results, then you can just open the respective notebook within ``./src/final``, which by default loads the final outputs from the same folder.

@@ -13,7 +13,7 @@ from src.config import SRC
 @pytask.mark.parametrize(
     "builder, produces",
     [
-        ("latexpdf", BLD / "documentation" / "latex" / "project_documentation.pdf"),
+        # ("latexpdf", BLD / "documentation" / "latex" / "project_documentation.pdf"),
         ("html", (BLD / "documentation" / "html").rglob("*.*")),
     ],
 )
@@ -21,7 +21,7 @@ def task_build_documentation(builder, produces):
     subprocess.run(
         [
             "sphinx-build",
-            "-M",
+            "-b",
             builder,
             SRC.joinpath("documentation").as_posix(),
             BLD.joinpath("documentation").as_posix(),

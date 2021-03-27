@@ -38,7 +38,7 @@ def task_simulation_artificial_dgps(produces):
     }
 
     n = [100, 2000]
-    number_simulations = 40
+    number_simulations = 50
     simulation_id = np.arange(number_simulations)
     identity = [True, False]
     p = [20, 80]
