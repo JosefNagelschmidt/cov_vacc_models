@@ -21,7 +21,6 @@ from src.model_code.helpers import true_params_in_conf_interval
 # from src.config import SRC
 
 
-@pytask.mark.skip
 @pytask.mark.produces(BLD / "analysis" / "simulation_study_artificial_results.csv")
 def task_simulation_artificial_dgps(produces):
     dgp_functions = {

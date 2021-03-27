@@ -20,7 +20,6 @@ add_profession = ["yes", "no"]
 add_political = ["yes", "no"]
 
 
-@pytask.mark.skip
 @pytask.mark.depends_on({"data": BLD / "data" / "sparse_modelling_df_add_profession_yes_add_political_yes.csv"})
 @pytask.mark.produces(BLD / "analysis" / "simulation_study_real_dgp_add_profession_yes_add_political_yes.csv")
 def task_simulation_real_dgps(depends_on, produces):

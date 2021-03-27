@@ -7,7 +7,6 @@ from src.config import BLD
 from src.config import SRC
 
 
-@pytask.mark.skip
 @pytask.mark.depends_on(
     {
         "set_1": BLD / "analysis" / "lpa_var_set_1_performance.csv",
