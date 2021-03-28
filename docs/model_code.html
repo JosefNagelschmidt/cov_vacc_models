@@ -1,0 +1,1226 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Model code &mdash; Covid vaccination models  documentation</title>
+
+
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+
+
+
+
+
+
+
+
+
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Model specifications" href="model_specs.html" />
+    <link rel="prev" title="Results" href="final.html" />
+</head>
+
+<body class="wy-body-for-nav">
+
+
+  <div class="wy-grid-for-nav">
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+            <a href="index.html" class="icon icon-home"> Covid vaccination models
+
+
+
+          </a>
+
+
+
+
+
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+        </div>
+
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+
+
+
+
+
+
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="original_data.html">Original data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_management.html">Data management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="final.html">Results</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Model code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-src.model_code.dgp">The data generating processes in the simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-src.model_code.estimators">The custom lasso and adaptive lasso implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-src.model_code.external_estimators">External estimators used as benchmarks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-src.model_code.helpers">Performance metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-src.model_code.test_estimators">Unit tests of custom implementation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model_specs.html">Model specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+
+
+
+        </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+
+      <nav class="wy-nav-top" aria-label="top navigation">
+
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Covid vaccination models</a>
+
+      </nav>
+
+
+      <div class="wy-nav-content">
+
+        <div class="rst-content">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+
+      <li>Model code</li>
+
+
+      <li class="wy-breadcrumbs-aside">
+
+
+            <a href="_sources/model_code.rst.txt" rel="nofollow"> View page source</a>
+
+
+      </li>
+
+  </ul>
+
+
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <div class="section" id="model-code">
+<span id="id1"></span><h1>Model code<a class="headerlink" href="#model-code" title="Permalink to this headline">¶</a></h1>
+<p>This directory contains most code related to the simulation study for the scientific computing course.
+It specifies functions for the data generating processes, my own implementation of the lasso and the adaptive lasso,
+and competing post-model-selection inference estimators based on sample splitting.
+Additionally, some benchmark metrics are specified.</p>
+<div class="section" id="module-src.model_code.dgp">
+<span id="the-data-generating-processes-in-the-simulations"></span><h2>The data generating processes in the simulations<a class="headerlink" href="#module-src.model_code.dgp" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="src.model_code.dgp.get_X_mat">
+<code class="sig-name descname"><span class="pre">get_X_mat</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identity_cov</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/dgp.html#get_X_mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.dgp.get_X_mat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a random regressor matrix of dimensionality <em>p</em> and sample size <em>n</em>. The regressors
+follow a multivariate normal distributions with either an identity, or a toeplitz-type covariance matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>) – sample size, or equivalently, the number of rows of the generated matrix</p></li>
+<li><p><strong>p</strong> (<em>int</em>) – number of regressors, or equivalently, the number of columns of the generated matrix</p></li>
+<li><p><strong>identity_cov</strong> (<em>bool</em>) – whether the identity matrix shall be used as a covariance matrix.
+If False, a toeplitz-type matrix is provided with power decay rho = 0.8</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>regressor matrix of dimensionality (n, p), following a multivariate normal distribution</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<em>np.ndarray</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.dgp.get_artificial_dgp">
+<code class="sig-name descname"><span class="pre">get_artificial_dgp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identity_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/dgp.html#get_artificial_dgp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.dgp.get_artificial_dgp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates an artificial DGP <span class="math notranslate nohighlight">\(y = m(X) + \epsilon\)</span> with a specified link function,
+partly linear main effect, and specified covariance structure for normally distributed regressors <em>X</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>) – sample size, or equivalently, the number of rows of the generated regressor matrix</p></li>
+<li><p><strong>p</strong> (<em>int</em>) – number of regressors, or equivalently, the number of columns of the generated regressor matrix</p></li>
+<li><p><strong>link_function</strong> (<em>str</em>) – the link_funtion for the main effect; currently available are
+“sine_link”, “polynomial_link”, and “linear_link”.</p></li>
+<li><p><strong>identity_cov</strong> (<em>bool</em>) – whether the identity matrix shall be used as a covariance matrix.
+If False, a toeplitz-type matrix is provided with power decay rho = 0.8</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>dict containing:</p>
+<blockquote>
+<div><p><strong>X</strong> (<em>np.ndarray</em>): generated regressor matrix of shape (n, p)</p>
+<p><strong>y</strong> (<em>np.ndarray</em>): generated vector of dependent variables of shape (n, 1)</p>
+<p><strong>beta</strong> (<em>np.ndarray</em>): vector of true coefficients of shape (p, 1)</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.dgp.get_cov_mat">
+<code class="sig-name descname"><span class="pre">get_cov_mat</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/dgp.html#get_cov_mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.dgp.get_cov_mat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates either an identity, or a toeplitz-type covariance matrix with dimensionality <em>p</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<em>int</em>) – dimensionality of the covariance matrix; number of regressors</p></li>
+<li><p><strong>identity</strong> (<em>bool</em>) – whether the identity matrix shall be used as a covariance matrix. If False,
+a toeplitz-type matrix is provided with power decay rho = 0.8</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>identity or toeplitz-type covariance matrix</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<em>np.ndarray</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.dgp.get_real_data_dgp">
+<code class="sig-name descname"><span class="pre">get_real_data_dgp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rel_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">january</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/dgp.html#get_real_data_dgp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.dgp.get_real_data_dgp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a DGP <span class="math notranslate nohighlight">\(y = g(X) + \epsilon\)</span> based on real-world (LISS) data. This more realistic
+data generating process is constructed in the following way:</p>
+<ol class="arabic simple">
+<li><p>Get a random sample of the data, e.g. of size <span class="math notranslate nohighlight">\(\lfloor \frac{n}{2} \rfloor\)</span> (<em>n</em> is sample size).</p></li>
+<li><p>Make a linear projection of <em>y</em> on the regressor matrix <em>X</em>, linearizing the model.</p></li>
+<li><p>Set medium-to-small regression parameters to zero, inducing some noise and adding sparsity characteristic.</p></li>
+<li><p>Get estimates from the projected model, using the updated parameters from (3) and adding some additional noise <span class="math notranslate nohighlight">\(\eta_i ∼ \mathcal{N}(0,\sigma^2)\)</span>.</p></li>
+</ol>
+<p>Following this procedure, one gets a linear characterization of the true conditional expectation function
+in order to assess coverage of estimated confidence intervals in a controlled environment, where the data
+generating process is known, but one does not risk to overfit to the data too much later on. This is
+particularly useful to gain information upon the adequacy of various methods in our real data sample,
+which includes many binary covariates, as well as a regressor matrix with a non-trivial covariance structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rel_path</strong> (<em>str</em>) – path to the .csv file of pre-processed data</p></li>
+<li><p><strong>january</strong> (<em>bool</em>) – whether data from january shall be used. If False, data from july is used instead.</p></li>
+<li><p><strong>sd</strong> (<em>float</em>) – standard deviation for the error term that is added</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>dict containing:</p>
+<blockquote>
+<div><p><strong>X</strong> (<em>np.ndarray</em>): true regressor matrix of shape (n, p)</p>
+<p><strong>y_true</strong> (<em>np.ndarray</em>): vector of true dependent variablev values of shape (n, )</p>
+<p><strong>y_artificial</strong> (<em>np.ndarray</em>): generated vector of dependent variables of shape (n, )</p>
+<p><strong>beta</strong> (<em>np.ndarray</em>): vector of generated (but assumed true) coefficients of shape (p, 1)</p>
+<p><strong>support</strong> (<em>np.ndarray</em>): logical vector of the coefficients that are active (non-zero)</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.dgp.get_true_beta_vec">
+<code class="sig-name descname"><span class="pre">get_true_beta_vec</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/dgp.html#get_true_beta_vec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.dgp.get_true_beta_vec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a true coefficient vector for the artifical DGPs considered in the simulation study.
+The number of relevant (active) coefficients is fixed to 10, the rest of the vector is filled with zeros.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>p</strong> (<em>int</em>) – number of regressors (or coefficients) in the corresponding dataset</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>sparse true coefficient vector</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(np.ndarray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.dgp.linear_link">
+<code class="sig-name descname"><span class="pre">linear_link</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/dgp.html#linear_link"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.dgp.linear_link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a linear main effect for the artificial DGP. The main effect is in this case
+just a linear combination of regressors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – regressor matrix of shape (n, p)</p></li>
+<li><p><strong>beta</strong> (<em>np.ndarray</em>) – vector of coefficients of shape (p, 1)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>vector of the main effects for the artificial DGP, which later become dependent variables after adding randomness; shape (n, )</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<em>np.ndarray</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.dgp.polynomial_link">
+<code class="sig-name descname"><span class="pre">polynomial_link</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/dgp.html#polynomial_link"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.dgp.polynomial_link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a polynomial main effect for the artificial DGP, with a partially linear
+structure (in the first factor). For simplicity, the polynomial link only goes up to the second order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – regressor matrix of shape (n, p)</p></li>
+<li><p><strong>beta</strong> (<em>np.ndarray</em>) – vector of coefficients of shape (p, 1)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>vector of the main effects for the artificial DGP, which later become dependent variables after adding randomness; shape (n, )</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<em>np.ndarray</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.dgp.sine_link">
+<code class="sig-name descname"><span class="pre">sine_link</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/dgp.html#sine_link"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.dgp.sine_link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a sine main effect for the artificial DGP, with a partially linear structure (in the first factor).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – regressor matrix of shape (n, p)</p></li>
+<li><p><strong>beta</strong> (<em>np.ndarray</em>) – vector of coefficients of shape (p, 1)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>vector of the main effects for the artificial DGP, which later become dependent variables after adding randomness; shape (n, )</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<em>np.ndarray</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.dgp.toeplitz_cov">
+<code class="sig-name descname"><span class="pre">toeplitz_cov</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/dgp.html#toeplitz_cov"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.dgp.toeplitz_cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a toeplitz-type covariance matrix, given dimensionality <em>p</em>, and <em>rho</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<em>int</em>) – dimensionality of the covariance matrix; number of regressors</p></li>
+<li><p><strong>rho</strong> (<em>float</em>) – the covariance matrix has power-decay entries <span class="math notranslate nohighlight">\(\Sigma_{ij} = \rho^{|i-j|}, 0 &lt; \rho &lt; 1\)</span></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>toeplitz-type covariance matrix</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<em>np.ndarray</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.model_code.estimators">
+<span id="the-custom-lasso-and-adaptive-lasso-implementation"></span><h2>The custom lasso and adaptive lasso implementation<a class="headerlink" href="#module-src.model_code.estimators" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="src.model_code.estimators.active_set_lasso">
+<code class="sig-name descname"><span class="pre">active_set_lasso</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty_factors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamda_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#active_set_lasso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.active_set_lasso" title="Permalink to this definition">¶</a></dt>
+<dd><p>Even more improved coordinate descent implementation of the lasso optimization problem with threshold as
+stopping criterion, the usage of <em>warm_starts</em>, and the usage of <em>active sets</em>. Cycling is stopped if the absolute
+difference between each updated theta and its former value is below the threshold <em>thresh</em>, and warm starts
+reuses the previously learned optimal coefficients as starting values for theta in the optimization for the next
+lambda element in the <em>lamda_path</em>. After an initial cycle through all <em>p</em> variables, the <em>active_set</em> feature
+restricts further iterations to the <em>active set</em> till convergence; and finally does one more cycle through all <em>p</em>
+variables to check if the active set has changed. This helps especially when <em>p</em> is large. Uses the base function
+<em>update_coeffs</em> for readability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – regressor matrix of shape (n, p)</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – vector of the dependent variable <em>y</em>, of shape (n, 1)</p></li>
+<li><p><strong>penalty_factors</strong> (<em>np.ndarray</em>) – vector of penalties that function as weights for the coefficients within
+the l1-penalty term of the adaptive lasso; later used in the <em>soft_threshold</em> function.
+The shape must be (p, 1). If none are provided, the function defaults to providing a vector of ones,
+which is the standard lasso version</p></li>
+<li><p><strong>theta</strong> (<em>np.ndarray</em>) – initial starting values for the vector of coefficients of shape (p, 1). If none are provided,
+the function defaults to setting each coefficient to zero initially</p></li>
+<li><p><strong>lamda_path</strong> (<em>np.ndarray</em>) – sequence of lambda values to solve the lasso problem for. If none are provided, the
+function provides a data-dependent sequence by default</p></li>
+<li><p><strong>num_iters</strong> (<em>int</em>) – Maximum number of cycles to update the coefficients; usually convergence is reached in
+under 100 iterations. Defaults to 100</p></li>
+<li><p><strong>intercept</strong> (<em>bool</em>) – logical value whether an intercept should be used when fitting (adaptive) lasso</p></li>
+<li><p><strong>thresh</strong> (<em>float</em>) – threshold for determining whether the update was small enough to classify
+the coefficient as converged</p></li>
+<li><p><strong>active_thresh</strong> (<em>float</em>) – threshold for determining whether the coefficient is still different
+enough from zero to be considered active</p></li>
+<li><p><strong>warm_start</strong> (<em>bool</em>) – Logical value determining whether the <em>warm_starts</em> feature should be used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>list of dicts, each containing:</p>
+<blockquote>
+<div><p><strong>lamda</strong> (<em>float</em>): non-negative regularization parameter in the l1-penalty term of the lasso and element of lamda_path</p>
+<p><strong>theta_std</strong> (<em>np.ndarray</em>): optimal lasso coefficients on the standardized scale for the given lambda in the dictionary, shape (p, )</p>
+<p><strong>theta_nat</strong> (<em>np.ndarray</em>): optimal lasso coefficients on the original scale for the given lambda in the dictionary, shape (p, )</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.adaptive_lasso">
+<code class="sig-name descname"><span class="pre">adaptive_lasso</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamda_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'OLS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_as_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#adaptive_lasso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.adaptive_lasso" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic implementation of the adaptive lasso from <strong>Zou, H. (2006)</strong>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – regressor matrix of shape (n, p)</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – vector of the dependent variable <em>y</em>, of shape (n, 1)</p></li>
+<li><p><strong>intercept</strong> (<em>bool</em>) – logical value whether an intercept should be used when fitting lasso or OLS</p></li>
+<li><p><strong>lamda_path</strong> (<em>np.ndarray</em>) – sequence of lambda values to solve the lasso problem for. If none are provided,
+the function provides a data-dependent sequence by default</p></li>
+<li><p><strong>gamma_path</strong> (<em>np.ndarray</em>) – sequence of gamma values to solve the lasso problem for (see paper above for more details on gamma).
+If none are provided, the function provides a simple yet broad enough sequence by default</p></li>
+<li><p><strong>first_stage</strong> (<em>str</em>) – Options are “OLS” and “Lasso” currently. Determines which method should be used for
+getting initial first-stage estimates for the coefficient vector. Defaults to “OLS”. If “Lasso”
+is chosen, the full <em>lamda_path</em> is calculated and the lamda that minimzes BIC is taken as a final
+estimate (for selection consistency), following <strong>Zou, H., Hastie, T., &amp; Tibshirani, R. (2007)</strong></p></li>
+<li><p><strong>num_iters</strong> (<em>int</em>) – Maximum number of cycles to update the coefficients; usually convergence is reached in
+under 100 iterations. Defaults to 100</p></li>
+<li><p><strong>out_as_df</strong> (<em>bool</em>) – Logical value determining whether the output should be in pd.DataFrame format instead
+of lists. This is necessary for later use with the <em>cv_adaptive_lasso</em> function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>if out_as_df = False, tuple containing:</p>
+<blockquote>
+<div><p><strong>path_gamma</strong> (<em>np.ndarray</em>): sequence of gamma values for which the lasso problem has actually been solved</p>
+<p><strong>results</strong> (<em>list</em>): list of tuples returned by calls to “lasso_numba”, one tuple for each gamma in <em>path_gamma</em></p>
+<p><strong>weight_path</strong> (<em>list</em>): list of np.ndarrays, each consisting of the coefficient weights used for solving lasso (for each gamma one)</p>
+</div></blockquote>
+<dl class="simple">
+<dt>if out_as_df = True, pd.DataFrame:</dt><dd><p><strong>df</strong> (<em>pd.DataFrame</em>): dataframe of results, consisting of the <em>path_gamma</em> and <em>path_lamda</em> vectors as its multiindex; and the standardized coefficient vectors, original scaled coefficient vectors, as well as gamma_weight vectors as its cell entries.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.adaptive_lasso_tuned">
+<code class="sig-name descname"><span class="pre">adaptive_lasso_tuned</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'OLS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_valid_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#adaptive_lasso_tuned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.adaptive_lasso_tuned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuned (i.e. cross-validated) version of the adaptive lasso.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – regressor matrix of shape (n, p)</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – vector of the dependent variable <em>y</em>, of shape (n, 1)</p></li>
+<li><p><strong>first_stage</strong> (<em>str</em>) – Options are “OLS” and “Lasso” currently. Determines which method should be used for getting initial
+first-stage estimates for the coefficient vector. Defaults to “OLS”. If “Lasso” is chosen, the full <em>lamda_path</em>
+is calculated and the lamda that minimzes BIC is taken as a final estimate (for selection consistency),
+following <strong>Zou, H., Hastie, T., &amp; Tibshirani, R. (2007)</strong></p></li>
+<li><p><strong>intercept</strong> (<em>bool</em>) – logical value whether an intercept shall be used while fitting the adaptive lasso for <em>theta_nat</em></p></li>
+<li><p><strong>cross_valid_split</strong> (<em>bool</em>) – Option to turn-off the exchange of the two cross-validation folds, thus evaluation
+is only done once on the second fold, while training is done on the first fold. In small samples
+this is currrently necessary, due to issues with float multiindexing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>dict containing:</p>
+<blockquote>
+<div><p><strong>selected_support</strong> (<em>np.ndarray</em>): logical vector of the coefficients that are active in the optimal adaptive lasso fit</p>
+<p><strong>theta_opt_nat</strong> (<em>np.ndarray</em>): optimal coefficient vector from fitting and cross-validating the adaptive lasso, on original scale</p>
+<p><strong>theta_opt_std</strong> (<em>np.ndarray</em>): optimal coefficient vector from fitting and cross-validating the adaptive lasso, on standardized scale</p>
+<p><strong>conf_intervals_nat</strong> (<em>np.ndarray</em>): elementwise confidence intervals at the 95% confidence level for optimal coefficients in the active set, on original scale</p>
+<p><strong>conf_intervals_std</strong> (<em>np.ndarray</em>): elementwise confidence intervals at the 95% confidence level for optimal coefficients in the active set, on standardized scale</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.count_non_zero_coeffs">
+<code class="sig-name descname"><span class="pre">count_non_zero_coeffs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta_vec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#count_non_zero_coeffs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.count_non_zero_coeffs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines the cardinality of the non-zero elements of a given input vector <em>theta_vec</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>theta_vec</strong> (<em>np.ndarray</em>) – 1d array (p, ) representation of a coefficient vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>cardinality of the non-zero elements of <em>theta_vec</em></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><strong>s</strong> (<em>int</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.cv_adaptive_lasso">
+<code class="sig-name descname"><span class="pre">cv_adaptive_lasso</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'OLS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_valid_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#cv_adaptive_lasso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.cv_adaptive_lasso" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function that cross-validates the adaptive lasso in the dimensions (gamma, lambda). Two folds
+are used in the current implementation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – regressor matrix of shape (n, p)</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – vector of the dependent variable <em>y</em>, of shape (n, 1)</p></li>
+<li><p><strong>intercept</strong> (<em>bool</em>) – logical value whether an intercept shall be used while fitting the adaptive lasso for <em>theta_nat</em></p></li>
+<li><p><strong>first_stage</strong> (<em>str</em>) – Options are “OLS” and “Lasso” currently. Determines which method should be used for getting
+initial first-stage estimates for the coefficient vector. Defaults to “OLS”. If “Lasso” is chosen, the full <em>lamda_path</em> is calculated and the lamda that minimzes BIC is taken as a final estimate (for selection consistency), following <strong>Zou, H., Hastie, T., &amp; Tibshirani, R. (2007)</strong></p></li>
+<li><p><strong>cross_valid_split</strong> (<em>bool</em>) – Option to turn-off the exchange of the two cross-validation folds, thus evaluation
+is only done once on the second fold, while training is done on the first fold. In small samples this is
+currently necessary, due to issues with float multiindexing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>tuple containing:</p>
+<blockquote>
+<div><p><strong>cv_overview</strong> (<em>pd.DataFrame</em>): Summary of all the possible combinations of gammas and lambdas with corresponding model performances in the differnt folds</p>
+<p><strong>params_opt</strong> (<em>tuple</em>): Optimal tuple of (gamma_opt, lambda_opt), measured in mean-squared error loss. Element of <em>cv_overview</em>.</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.eps_thresh_lasso">
+<code class="sig-name descname"><span class="pre">eps_thresh_lasso</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty_factors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamda_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#eps_thresh_lasso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.eps_thresh_lasso" title="Permalink to this definition">¶</a></dt>
+<dd><p>Improved coordinate descent implementation of the basic lasso optimization problem with
+threshold as stopping criterion. Cycling is stopped if the absolute difference between each updated
+theta and its former value is below the threshold <em>thresh</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – regressor matrix of shape (n, p)</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – vector of the dependent variable <em>y</em>, of shape (n, 1)</p></li>
+<li><p><strong>penalty_factors</strong> (<em>np.ndarray</em>) – vector of penalties that function as weights for the coefficients
+within the l1-penalty term of the adaptive lasso; later used in the <em>soft_threshold</em> function.
+The shape must be (p, 1). If none are provided, the function defaults to providing a vector of ones,
+which is the standard lasso version.</p></li>
+<li><p><strong>theta</strong> (<em>np.ndarray</em>) – initial starting values for the vector of coefficients of shape (p, 1). If none
+are provided, the function defaults to setting each coefficient to zero initially.</p></li>
+<li><p><strong>lamda_path</strong> (<em>np.ndarray</em>) – sequence of lambda values to solve the lasso problem for. If none are
+provided, the function provides a data-dependent sequence by default.</p></li>
+<li><p><strong>num_iters</strong> (<em>int</em>) – Maximum number of cycles to update the coefficients; usually convergence is reached
+in under 100 iterations. Defaults to 100.</p></li>
+<li><p><strong>intercept</strong> (<em>bool</em>) – logical value whether an intercept should be used when fitting (adaptive) lasso</p></li>
+<li><p><strong>thresh</strong> (<em>float</em>) – determines the relevant threshold for the  absolute difference between each updated
+theta and its former value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>list of dicts, each containing:</p>
+<blockquote>
+<div><p><strong>lamda</strong> (<em>float</em>): non-negative regularization parameter in the l1-penalty term of the lasso and element of lamda_path</p>
+<p><strong>theta_std</strong> (<em>np.ndarray</em>): optimal lasso coefficients on the standardized scale for the given lambda in the dictionary, shape (p, )</p>
+<p><strong>theta_nat</strong> (<em>np.ndarray</em>): optimal lasso coefficients on the original scale for the given lambda in the dictionary, shape (p, )</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.eps_thresh_lasso_warm_start">
+<code class="sig-name descname"><span class="pre">eps_thresh_lasso_warm_start</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty_factors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamda_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#eps_thresh_lasso_warm_start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.eps_thresh_lasso_warm_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Further improved coordinate descent implementation of the basic lasso optimization problem with threshold as
+stopping criterion and the usage of <em>warm_starts</em>. Cycling is stopped if the absolute difference between each updated
+theta and its former value is below the threshold <em>thresh</em>, and warm starts reuse the previously learned optimal
+coefficients as starting values for theta in the optimization for the next lambda element in the <em>lamda_path</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – regressor matrix of shape (n, p)</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – vector of the dependent variable <em>y</em>, of shape (n, 1)</p></li>
+<li><p><strong>penalty_factors</strong> (<em>np.ndarray</em>) – vector of penalties that function as weights for the coefficients within
+the l1-penalty term of the adaptive lasso; later used in the <em>soft_threshold</em> function. The shape must
+be (p, 1). If none are provided, the function defaults to providing a vector of ones, which is
+the standard lasso version.</p></li>
+<li><p><strong>theta</strong> (<em>np.ndarray</em>) – initial starting values for the vector of coefficients of shape (p, 1).
+If none are provided, the function defaults to setting each coefficient to zero initially.</p></li>
+<li><p><strong>lamda_path</strong> (<em>np.ndarray</em>) – sequence of lambda values to solve the lasso problem for.
+If none are provided, the function provides a data-dependent sequence by default.</p></li>
+<li><p><strong>num_iters</strong> (<em>int</em>) – Maximum number of cycles to update the coefficients; usually convergence is reached in
+under 100 iterations. Defaults to 100.</p></li>
+<li><p><strong>intercept</strong> (<em>bool</em>) – logical value whether an intercept should be used when fitting (adaptive) lasso</p></li>
+<li><p><strong>thresh</strong> (<em>float</em>) – threshold for determining whether the update was small enough to classify
+the coefficient as converged</p></li>
+<li><p><strong>warm_start</strong> (<em>bool</em>) – Logical value determining whether the <em>warm_starts</em> feature should be used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>list of dicts, each containing:</p>
+<blockquote>
+<div><p><strong>lamda</strong> (<em>float</em>): non-negative regularization parameter in the l1-penalty term of the lasso and element of lamda_path</p>
+<p><strong>theta_std</strong> (<em>np.ndarray</em>): optimal lasso coefficients on the standardized scale for the given lambda in the dictionary, shape (p, )</p>
+<p><strong>theta_nat</strong> (<em>np.ndarray</em>): optimal lasso coefficients on the original scale for the given lambda in the dictionary, shape (p, )</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.get_conf_intervals">
+<code class="sig-name descname"><span class="pre">get_conf_intervals</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lamda</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_nat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_std</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#get_conf_intervals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.get_conf_intervals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the adaptive lasso confidence intervals of active coefficients, i.e. coefficients in <em>theta_std</em>
+that are distinct from zero. The calculations are based on the Standard Error Formula in chapter 3.6. in Zou, H. (2006).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lamda</strong> (<em>float</em>) – non-negative regularization parameter in the l1-penalty term of the lasso</p></li>
+<li><p><strong>weights</strong> (<em>np.ndarray</em>) – vector of penalties/ weights for the coefficients within the l1-penalty term
+of the adaptive lasso. The shape must be (p, 1)</p></li>
+<li><p><strong>theta_std</strong> (<em>np.ndarray</em>) – vector of previously fitted adaptive lasso coefficients on standardized scale of shape (p, )</p></li>
+<li><p><strong>theta_nat</strong> (<em>np.ndarray</em>) – vector of previously fitted adaptive lasso coefficients on original scale of shape (p, )</p></li>
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – regressor matrix of shape (n, p)</p></li>
+<li><p><strong>X_std</strong> (<em>np.ndarray</em>) – standardized regressor matrix of shape (n, p)</p></li>
+<li><p><strong>intercept</strong> (<em>bool</em>) – logical value whether an intercept was used while fitting the adaptive lasso</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – vector of the dependent variable <em>y</em>, of shape (n, 1)</p></li>
+<li><p><strong>y_std</strong> (<em>np.ndarray</em>) – standardized vector of the dependent variable <em>y</em>, of shape (n, 1)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>dict containing:</p>
+<blockquote>
+<div><p><strong>beta_hat_nat_cov_mat</strong> (<em>np.ndarray</em>): estimated asymptotic covariance matrix (on original scale) for the active set of estimated coefficients from adaptive lasso</p>
+<p><strong>beta_hat_std_cov_mat</strong> (<em>np.ndarray</em>): estimated asymptotic covariance matrix (on standardized scale) for the active set of estimated coefficients from adaptive lasso</p>
+<p><strong>conf_intervals_nat</strong> (<em>np.ndarray</em>): elementwise confidence intervals at the 95% confidence level for coefficients in the active set, on original scale</p>
+<p><strong>conf_intervals_std</strong> (<em>np.ndarray</em>): elementwise confidence intervals at the 95% confidence level for coefficients in the active set, on standardized scale</p>
+<p><strong>active_set</strong> (<em>np.ndarray</em>): the active (non-zero) set of coefficients in <em>theta_nat</em> for which confidence intervals were calculated</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.get_lamda_path">
+<code class="sig-name descname"><span class="pre">get_lamda_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#get_lamda_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.get_lamda_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates a data-dependent sequence of lambdas, for which we want to solve the lasso optimization problem.
+This approach follows the one used in <em>glmnet</em> package in R.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_std</strong> (<em>np.ndarray</em>) – standardized regressor matrix of shape (n, p)</p></li>
+<li><p><strong>y_std</strong> (<em>np.ndarray</em>) – standardized vector of the dependent variable <em>y</em>, of shape (n, 1) or (n, )</p></li>
+<li><p><strong>epsilon</strong> (<em>float</em>) – parameter determining the lower bound of the lambda sequence</p></li>
+<li><p><strong>K</strong> (<em>int</em>) – parameter determining the number of elements within the lambda sequence</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>data-dependent sequence of lambdas (optimization path for lasso)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><strong>lamda_path</strong> (<em>np.ndarray</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.get_lamda_path_numba">
+<code class="sig-name descname"><span class="pre">get_lamda_path_numba</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_std</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#get_lamda_path_numba"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.get_lamda_path_numba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just-in-time compiled version of the <em>get_lamda_path</em> function used within the lasso regression</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.interpretable_confidence_intervals">
+<code class="sig-name descname"><span class="pre">interpretable_confidence_intervals</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adaptive_lasso_tuned_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#interpretable_confidence_intervals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.interpretable_confidence_intervals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rearranges the output from the <em>adaptive_lasso_tuned</em> method for later analysis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adaptive_lasso_tuned_obj</strong> (<em>dict</em>) – return object from a call to <em>adaptive_lasso_tuned</em></p></li>
+<li><p><strong>intercept</strong> (<em>bool</em>) – logical value whether an intercept was used while fitting the adaptive lasso</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>tuple containing:</p>
+<blockquote>
+<div><p>(<em>pd.DataFrame</em>): contains a column of the selected_support, a column of estimated coefficients, but without the intercept, and two columns of lower- and upper confidence bounds</p>
+<p>(<em>float</em>): value of the estimated intercept, if <em>intercept</em> = True</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.lasso_numba">
+<code class="sig-name descname"><span class="pre">lasso_numba</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamda_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty_factors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#lasso_numba"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.lasso_numba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just-in-time compiled version of the <em>active_set_lasso</em> function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – regressor matrix of shape (n, p)</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – vector of the dependent variable <em>y</em>, of shape (n, 1)</p></li>
+<li><p><strong>penalty_factors</strong> (<em>np.ndarray</em>) – vector of penalties that function as weights for the coefficients within the
+l1-penalty term of the adaptive lasso; later used in the <em>soft_threshold</em> function. The shape must
+be (p, 1). If none are provided, the function defaults to providing a vector of ones,
+which is the standard lasso version</p></li>
+<li><p><strong>theta</strong> (<em>np.ndarray</em>) – initial starting values for the vector of coefficients of shape (p, 1).
+If none are provided, the function defaults to setting each coefficient to zero initially</p></li>
+<li><p><strong>lamda_path</strong> (<em>np.ndarray</em>) – sequence of lambda values to solve the lasso problem for. If none are provided,
+the function provides a data-dependent sequence by default</p></li>
+<li><p><strong>num_iters</strong> (<em>int</em>) – Maximum number of cycles to update the coefficients; usually convergence is reached
+in under 100 iterations. Defaults to 100</p></li>
+<li><p><strong>intercept</strong> (<em>bool</em>) – logical value whether an intercept should be used when fitting (adaptive) lasso</p></li>
+<li><p><strong>thresh</strong> (<em>float</em>) – threshold for determining whether the update was small enough to classify
+the coefficient as converged</p></li>
+<li><p><strong>active_thresh</strong> (<em>float</em>) – threshold for determining whether the coefficient is still different enough
+from zero to be considered active</p></li>
+<li><p><strong>warm_start</strong> (<em>bool</em>) – Logical value determining whether the <em>warm_starts</em> feature should be used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>tuple containing:</p>
+<blockquote>
+<div><p><strong>lamdas</strong> (<em>list</em>): list of lamdas in lamda_path for which the lasso problem has been solved</p>
+<p><strong>thetas</strong> (<em>list</em>): list of lasso coefficient vectors on the standardized scale, for each lambda in <em>lamdas</em> one optimal coefficient vector</p>
+<p><strong>thetas_nat</strong> (<em>list</em>): list of lasso coefficient vectors on the original scale, for each lambda in <em>lamdas</em> one optimal coefficient vector</p>
+<p><strong>BIC</strong> (<em>list</em>): list of BIC values, one for each lambda in <em>lamdas</em> (BIC calculated from the respective model trained given a lambda value). For details see <strong>Zou, H., Hastie, T., &amp; Tibshirani, R. (2007)</strong></p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.make_prediction">
+<code class="sig-name descname"><span class="pre">make_prediction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_nat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#make_prediction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.make_prediction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function that takes fitted coefficients from a lasso problem and outputs fitted values on some
+sample data matrix X (possibly not the same as the one used for fitting). It also calculates the
+mean-squared-error between fitted and actual responses <em>y_hat</em> and <em>y</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – regressor (data) matrix of shape (n, p), not necessarily the same matrix that was used for fitting <em>theta_nat</em></p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – corresponding vector of the dependent variable <em>y</em>, of shape (n, 1)</p></li>
+<li><p><strong>theta_nat</strong> (<em>np.ndarray</em>) – vector of previously fitted adaptive lasso coefficients on original scale of shape (p, )</p></li>
+<li><p><strong>intercept</strong> (<em>bool</em>) – logical value whether an intercept was used while fitting the adaptive lasso for <em>theta_nat</em></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>tuple containing:</p>
+<blockquote>
+<div><p><strong>y_hat</strong> (<em>np.ndarray</em>): fitted responses for the given sample in <em>X</em></p>
+<p><strong>mse</strong> (<em>float</em>): mean-squared-error between fitted and actual responses <em>y_hat</em> and <em>y</em></p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.naive_lasso">
+<code class="sig-name descname"><span class="pre">naive_lasso</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty_factors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamda_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#naive_lasso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.naive_lasso" title="Permalink to this definition">¶</a></dt>
+<dd><p>Naive coordinate descent implementation of the basic lasso optimization problem without stopping criterion
+except the maximum number of iterations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – regressor matrix of shape (n, p)</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – vector of the dependent variable <em>y</em>, of shape (n, 1)</p></li>
+<li><p><strong>penalty_factors</strong> (<em>np.ndarray</em>) – vector of penalties that function as weights for the coefficients
+within the l1-penalty term of the adaptive lasso; later used in the <em>soft_threshold</em> function.
+The shape must be (p, 1). If none are provided, the function defaults to providing a vector of ones,
+which is the standard lasso version.</p></li>
+<li><p><strong>theta</strong> (<em>np.ndarray</em>) – initial starting values for the vector of coefficients of shape (p, 1).
+If none are provided, the function defaults to setting each coefficient to zero initially.</p></li>
+<li><p><strong>lamda_path</strong> (<em>np.ndarray</em>) – sequence of lambda values to solve the lasso problem for.
+If none are provided, the function provides a data-dependent sequence by default.</p></li>
+<li><p><strong>num_iters</strong> (<em>int</em>) – Maximum number of cycles to update the coefficients; usually convergence is
+reached in under 100 iterations. Defaults to 100.</p></li>
+<li><p><strong>intercept</strong> (<em>bool</em>) – logical value whether an intercept should be used when fitting (adaptive) lasso</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>list of dicts, each containing:</p>
+<blockquote>
+<div><p><strong>lamda</strong> (<em>float</em>): non-negative regularization parameter in the l1-penalty term of the lasso and element of lamda_path</p>
+<p><strong>theta_std</strong> (<em>np.ndarray</em>): optimal lasso coefficients on the standardized scale for the given lambda in the dictionary, shape (p, )</p>
+<p><strong>theta_nat</strong> (<em>np.ndarray</em>): optimal lasso coefficients on the original scale for the given lambda in the dictionary, shape (p, )</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.soft_threshold">
+<code class="sig-name descname"><span class="pre">soft_threshold</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamda</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#soft_threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.soft_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Soft threshold function used for standardized data within the lasso regression.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rho</strong> (<em>float</em>) – defined as <span class="math notranslate nohighlight">\(\rho := X_j^T (y - y_{pred} + \theta_j \cdot X_j)\)</span>,
+where <span class="math notranslate nohighlight">\(X_j\)</span> is the <em>j</em>-th column of the regressor matrix, <em>y</em> is the dependent variable
+vector, <span class="math notranslate nohighlight">\(y_{pred} := X \cdot \theta\)</span> (projection), and <span class="math notranslate nohighlight">\(\theta\)</span> the coefficient vector.</p></li>
+<li><p><strong>lamda</strong> (<em>float</em>) – non-negative regularization parameter in the l1-penalty term of the lasso</p></li>
+<li><p><strong>w</strong> (<em>float</em>) – weight for a given coefficient within the l1-penalty term of the adaptive lasso</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>proximal mapping of the l1-norm; solution of coordinate descent for the update step in lasso</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<em>float</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.soft_threshold_numba">
+<code class="sig-name descname"><span class="pre">soft_threshold_numba</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamda</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#soft_threshold_numba"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.soft_threshold_numba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just-in-time compiled version of the <em>soft_threshold</em> function used within the lasso regression</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.standardize_input">
+<code class="sig-name descname"><span class="pre">standardize_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#standardize_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.standardize_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standardizes the regressor matrix and the dependent vector.
+:param X: regressor matrix of shape (n, p)
+:type X: np.ndarray
+:param y: vector of the dependent variable <em>y</em>, of shape (n, 1) or (n, )
+:type y: np.ndarray</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>tuple containing:</p>
+<blockquote>
+<div><p><strong>X_standardized</strong> (<em>np.ndarray</em>): standardized regressor matrix of shape (n, p)</p>
+<p><strong>y_standardized</strong> (<em>np.ndarray</em>): standardized vector of the dependent variable <em>y</em>, of shape (n, 1) or (n, )</p>
+<p><strong>x_mean</strong> (<em>np.ndarray</em>): column means of the regressor matrix of shape (p, )</p>
+<p><strong>x_std</strong> (<em>np.ndarray</em>): column standard deviations of the regressor matrix of shape (p, )</p>
+<p><strong>y_mean</strong> (<em>np.float64</em>): mean of the vector of the dependent variable <em>y</em></p>
+<p><strong>y_std</strong> (<em>np.float64</em>): standard deviation of the vector of the dependent variable <em>y</em></p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.estimators.update_coeffs">
+<code class="sig-name descname"><span class="pre">update_coeffs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty_factors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamda</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_thresh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/estimators.html#update_coeffs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.estimators.update_coeffs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the update of the coefficients within each loop of <em>active_set_lasso</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_std</strong> (<em>np.ndarray</em>) – standardized regressor matrix of shape (n, p)</p></li>
+<li><p><strong>y_std</strong> (<em>np.ndarray</em>) – standardized vector of the dependent variable <em>y</em>, of shape (n, 1)</p></li>
+<li><p><strong>theta</strong> (<em>np.ndarray</em>) – vector of coefficients of shape (p, 1)</p></li>
+<li><p><strong>active_set</strong> (<em>np.ndarray</em>) – indeces of coefficients to consider in the update, i.e. these
+coefficients are not zero and still active</p></li>
+<li><p><strong>penalty_factors</strong> (<em>np.ndarray</em>) – vector of penalties that function as weights for the coefficients
+within the l1-penalty term of the adaptive lasso; later used in the <em>soft_threshold</em> function.
+The shape must be (p, 1)</p></li>
+<li><p><strong>intercept</strong> (<em>bool</em>) – logical value whether an intercept should be used when fitting (adaptive) lasso</p></li>
+<li><p><strong>lamda</strong> (<em>float</em>) – non-negative regularization parameter in the l1-penalty term of the lasso</p></li>
+<li><p><strong>thresh</strong> (<em>float</em>) – threshold for determining whether the update was small enough to classify the coefficient
+as converged</p></li>
+<li><p><strong>active_thresh</strong> (<em>float</em>) – threshold for determining whether the coefficient is still different enough from zero
+to be considered active</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>tuple containing:</p>
+<blockquote>
+<div><p><strong>theta</strong> (<em>np.ndarray</em>): updated vector of coefficients of shape (p, 1)</p>
+<p><strong>active_set</strong> (<em>np.ndarray</em>): indeces of coefficients to consider in the next cycle, i.e. updated version of <em>active_set</em></p>
+<p><strong>active_set_converged</strong> (<em>bool</em>): Logical value whether all ex ante active coefficients have converged within this cycle</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.model_code.external_estimators">
+<span id="external-estimators-used-as-benchmarks"></span><h2>External estimators used as benchmarks<a class="headerlink" href="#module-src.model_code.external_estimators" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="src.model_code.external_estimators.OLS_confidence_intervals">
+<code class="sig-name descname"><span class="pre">OLS_confidence_intervals</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_validation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_validation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">support</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/external_estimators.html#OLS_confidence_intervals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.external_estimators.OLS_confidence_intervals" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method produces an OLS fit of <em>y_validation</em> on a subset of regressors in the data matrix <em>X_validation</em>
+(only relevant variables are considered), and then generates confidence intervals for each of the coefficients in
+the active set. This is the second-stage of a naive post-model selection inference procedure, where a pre-selected
+set of relevant regressors is passed to the OLS stage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_validation</strong> (<em>np.ndarray</em>) – subsample of the regressor matrix of shape (n, p) used for the model selection step</p></li>
+<li><p><strong>y_validation</strong> (<em>np.ndarray</em>) – corresponding subsample of values of the dependent variable <em>y</em>, of shape (n, 1) or (n, )</p></li>
+<li><p><strong>support</strong> (<em>np.ndarray</em>) – logical vector of shape (p, ), indicating which regressors in the columns
+of <em>X_validation</em> are relevant (True). Passed from the first-stage selector</p></li>
+<li><p><strong>intercept</strong> (<em>bool</em>) – logical value whether an intercept shall be used when fitting OLS</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>confidence intervals for relevant regressors as indicated in <em>support</em>. Lower bounds are in the first column, upper bounds in the second column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<em>np.ndarray</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.external_estimators.boruta_selector">
+<code class="sig-name descname"><span class="pre">boruta_selector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_fold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_fold</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/external_estimators.html#boruta_selector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.external_estimators.boruta_selector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Selector based on the boruta algorithm, paired with random forests as base learners.
+See <a class="reference external" href="https://github.com/scikit-learn-contrib/boruta_py">https://github.com/scikit-learn-contrib/boruta_py</a> for more details. No cross-validation
+of max_depth of the random forests is done, since this was not feasible in time, however, random
+forests are supposed to work reasonably well out-of-the box. This is the first-stage
+of a naive post-model selection inference procedure, where OLS confidence bands are later estimated
+on the remaining active set of regressors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_fold</strong> (<em>np.ndarray</em>) – subsample of the regressor matrix of shape (n, p) used for the model selection step</p></li>
+<li><p><strong>y_fold</strong> (<em>np.ndarray</em>) – corresponding subsample of values of the dependent variable <em>y</em>, of shape (n, 1) or (n, )</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>logical vector of shape (p, ), indicating which regressors are relevant (True)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<em>np.ndarray</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.external_estimators.lasso_feature_selection">
+<code class="sig-name descname"><span class="pre">lasso_feature_selection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_fold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_fold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/external_estimators.html#lasso_feature_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.external_estimators.lasso_feature_selection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple cross-validated (two folds) lasso, setting coefficients of non-relevant regressors to zero.
+This is the first-stage of a naive post-model selection inference procedure, where OLS confidence bands
+are later estimated on the remaining active set of regressors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_fold</strong> (<em>np.ndarray</em>) – subsample of the regressor matrix of shape (n, p) used for the model selection step</p></li>
+<li><p><strong>y_fold</strong> (<em>np.ndarray</em>) – corresponding subsample of values of the dependent variable <em>y</em>, of shape (n, 1) or (n, )</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>logical vector of shape (p, ), indicating which regressors are relevant (True)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<em>np.ndarray</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.external_estimators.sk_learn_lasso">
+<code class="sig-name descname"><span class="pre">sk_learn_lasso</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamda_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/external_estimators.html#sk_learn_lasso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.external_estimators.sk_learn_lasso" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for the coordinate descent implementation of the lasso optimization problem by the scikit-learn library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – regressor matrix of shape (n, p)</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – vector of the dependent variable <em>y</em>, of shape (n, 1)</p></li>
+<li><p><strong>intercept</strong> (<em>bool</em>) – logical value whether an intercept should be used when fitting lasso</p></li>
+<li><p><strong>lamda_path</strong> (<em>np.ndarray</em>) – sequence of lambda values to solve the lasso problem for.
+If none are provided, the function provides a data-dependent sequence by default.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>tuple containing:</p>
+<blockquote>
+<div><p><strong>lamdas</strong> (<em>list</em>): sequence of lambda values as specified in <em>lamda_path</em>, otherwise generated data-dependent sequence of lambda values for which lasso was solved
+<strong>coeffs</strong> (<em>list</em>): list of optimal lasso coefficient vectors on the standardized scale, one for each lambda in <em>lamdas</em></p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.external_estimators.univariate_feature_selection">
+<code class="sig-name descname"><span class="pre">univariate_feature_selection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_fold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_fold</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/external_estimators.html#univariate_feature_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.external_estimators.univariate_feature_selection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Selector based on simple univariate test statistics,
+see <a class="reference external" href="https://scikit-learn.org/stable/modules/feature_selection.html#univariate-feature-selection">https://scikit-learn.org/stable/modules/feature_selection.html#univariate-feature-selection</a>
+for more details. Grid search cross-validation over the optimal number of relevant regressors (here: <em>k</em>) is
+conducted via the scikit-learn GridSearchCV method. This is the first-stage of a naive post-model selection
+inference procedure, where OLS confidence bands are later estimated on the remaining active set of regressors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_fold</strong> (<em>np.ndarray</em>) – subsample of the regressor matrix of shape (m, p) used for the model selection step</p></li>
+<li><p><strong>y_fold</strong> (<em>np.ndarray</em>) – corresponding subsample of values of the dependent variable <em>y</em>, of shape (n, 1) or (n, )</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>logical vector of shape (p, ), indicating which regressors are relevant (True)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<em>np.ndarray</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.model_code.helpers">
+<span id="performance-metrics"></span><h2>Performance metrics<a class="headerlink" href="#module-src.model_code.helpers" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="src.model_code.helpers.selection_power">
+<code class="sig-name descname"><span class="pre">selection_power</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">true_support</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_support</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/helpers.html#selection_power"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.helpers.selection_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates various metrics to evaluate the performance of different model-selection methods for a given artificial (and known) DGP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>true_support</strong> (<em>np.ndarray</em>) – logical vector of shape (p, ), indicating which regressor variables are in fact relevant, which is known since the DGP is known</p></li>
+<li><p><strong>selected_support</strong> (<em>np.ndarray</em>) – logical vector of shape (p, ), indicating which regressor variables were chosen relevant (i.e. were selected) by an arbitrary model-selection procedure</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>dict containing:</p>
+<blockquote>
+<div><p><strong>share_of_truth_uncovered</strong> (<em>float</em>): Correctly selected relevant variables relative to total number of relevant variables</p>
+<p><strong>ratio_total_select_coeffs_true_coeffs</strong> (<em>float</em>): Number of selected variables relative to total number of relevant variables</p>
+<p><strong>false_pos_share_true_support</strong> (<em>float</em>): Number of mistakenly selected variables (which are irrelevant) relative to total number of relevant variables</p>
+<p><strong>false_pos_share_right_selection</strong> (<em>float</em>): Number of mistakenly selected variables (i.e. irrelevant ones) relative to correctly selected (i.e. relevant) variables</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.helpers.true_params_in_conf_interval">
+<code class="sig-name descname"><span class="pre">true_params_in_conf_interval</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">true_theta_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf_int_matrix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/helpers.html#true_params_in_conf_interval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.helpers.true_params_in_conf_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether elements from the vector <em>true_theta_vec</em> are within certain bounds as specified in <em>conf_int_matrix</em>. The procedure works elementwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>true_theta_vec</strong> (<em>np.ndarray</em>) – Vector of true coefficients (in a partly linear model) from a given DGP. One can also pass only relevant (i.e. non-zero) coefficients from the true model, but the dimensions between <em>true_theta_vec</em> and <em>conf_int_matrix</em> must match</p></li>
+<li><p><strong>conf_int_matrix</strong> (<em>np.ndarray</em>) – confidence intervals for the elements in <em>true_theta_vec</em>. Lower bounds are in the first column, upper bounds in the second column</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>logical vector, indicating which coefficients from <em>true_theta_vec</em> are within the bounds from <em>conf_int_matrix</em></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(np.ndarray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.model_code.test_estimators">
+<span id="unit-tests-of-custom-implementation"></span><h2>Unit tests of custom implementation<a class="headerlink" href="#module-src.model_code.test_estimators" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="src.model_code.test_estimators.setup_p_larger_n_data">
+<code class="sig-name descname"><span class="pre">setup_p_larger_n_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/test_estimators.html#setup_p_larger_n_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.test_estimators.setup_p_larger_n_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creating a DGP where the regressor matrix X has more regressors (columns) than observations (rows).</p>
+<p>Args:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl>
+<dt>dict containing:</dt><dd><p><strong>X</strong> (<em>np.ndarray</em>): generated regressor matrix <em>X</em> (sample data) for testing</p>
+<p><strong>y</strong> (<em>np.ndarray</em>): generated vector of dependent variable values <em>y</em></p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.model_code.test_estimators.setup_p_less_n_data">
+<code class="sig-name descname"><span class="pre">setup_p_less_n_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/test_estimators.html#setup_p_less_n_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.model_code.test_estimators.setup_p_less_n_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creating a DGP where the regressor matrix X has less regressors (columns) than observations (rows).</p>
+<p>Args:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl>
+<dt>dict containing:</dt><dd><p><strong>X</strong> (<em>np.ndarray</em>): generated regressor matrix <em>X</em> (sample data) for testing</p>
+<p><strong>y</strong> (<em>np.ndarray</em>): generated vector of dependent variable values <em>y</em></p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="model_specs.html" class="btn btn-neutral float-right" title="Model specifications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="final.html" class="btn btn-neutral float-left" title="Results" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021-, Josef Nagelschmidt.
+
+    </p>
+  </div>
+
+
+
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+
+
+
+
+
+</body>
+</html>

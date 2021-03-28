@@ -1,0 +1,669 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>src.data_management.task_lpa_process_aux_var_data &mdash; Covid vaccination models  documentation</title>
+
+
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+
+
+
+
+
+
+
+
+
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+
+
+  <div class="wy-grid-for-nav">
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+            <a href="../../../index.html" class="icon icon-home"> Covid vaccination models
+
+
+
+          </a>
+
+
+
+
+
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+        </div>
+
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+
+
+
+
+
+
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../original_data.html">Original data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_management.html">Data management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../final.html">Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model_code.html">Model code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model_specs.html">Model specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+</ul>
+
+
+
+        </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+
+      <nav class="wy-nav-top" aria-label="top navigation">
+
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Covid vaccination models</a>
+
+      </nav>
+
+
+      <div class="wy-nav-content">
+
+        <div class="rst-content">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+
+      <li>src.data_management.task_lpa_process_aux_var_data</li>
+
+
+      <li class="wy-breadcrumbs-aside">
+
+      </li>
+
+  </ul>
+
+
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.data_management.task_lpa_process_aux_var_data</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pytask</span>
+
+<span class="kn">from</span> <span class="nn">src.config</span> <span class="kn">import</span> <span class="n">BLD</span>
+<span class="kn">from</span> <span class="nn">src.config</span> <span class="kn">import</span> <span class="n">SRC</span>
+
+
+<div class="viewcode-block" id="clean_aux_data"><a class="viewcode-back" href="../../../data_management.html#src.data_management.task_lpa_process_aux_var_data.clean_aux_data">[docs]</a><span class="k">def</span> <span class="nf">clean_aux_data</span><span class="p">(</span>
+    <span class="n">covid_data_2020_12</span><span class="p">,</span>
+    <span class="n">covid_data_2020_03</span><span class="p">,</span>
+    <span class="n">covid_data_2020_04</span><span class="p">,</span>
+    <span class="n">covid_data_2020_05</span><span class="p">,</span>
+    <span class="n">background_data</span><span class="p">,</span>
+    <span class="n">political_data</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Function to be called by `task_lpa_process_aux_var_data`. Cleans and then returns the input data files.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        covid_data_2020_12 (pd.DataFrame): the dataframe from the pickle file</span>
+<span class="sd">            named *covid_data_2020_12.pickle*  (preprocessed data from a LISS questionnaire)</span>
+<span class="sd">        covid_data_2020_03 (pd.DataFrame): the dataframe from the pickle file</span>
+<span class="sd">            named *covid_data_2020_03.pickle*  (preprocessed data from a LISS questionnaire)</span>
+<span class="sd">        covid_data_2020_04 (pd.DataFrame): the dataframe from the pickle file</span>
+<span class="sd">            named *covid_data_2020_04.pickle*  (preprocessed data from a LISS questionnaire)</span>
+<span class="sd">        covid_data_2020_05 (pd.DataFrame): the dataframe from the pickle file</span>
+<span class="sd">            named *covid_data_2020_05.pickle*  (preprocessed data from a LISS questionnaire)</span>
+<span class="sd">        background_data (pd.DataFrame): the dataframe from the pickle file</span>
+<span class="sd">            named *background_data_merged.pickle*  (preprocessed data from a LISS questionnaire)</span>
+<span class="sd">        political_data (pd.DataFrame): the dataframe from the pickle file</span>
+<span class="sd">            named *politics_values.pickle* (preprocessed data from a LISS questionnaire)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: list containing:</span>
+
+<span class="sd">            **covid_data_2020_12_cleaned** (*pd.DataFrame*): cleaned version of *covid_data_2020_12* \n</span>
+<span class="sd">            **covid_data_2020_03_cleaned** (*pd.DataFrame*): cleaned version of *covid_data_2020_03*  \n</span>
+<span class="sd">            **covid_data_2020_04_cleaned** (*pd.DataFrame*): cleaned version of *covid_data_2020_04* \n</span>
+<span class="sd">            **covid_data_2020_05_cleaned** (*pd.DataFrame*): cleaned version of *covid_data_2020_05*  \n</span>
+<span class="sd">            **political_data_cleaned** (*pd.DataFrame*): cleaned version of *political_data* \n</span>
+<span class="sd">            **background_data_cleaned** (*pd.DataFrame*): cleaned version of *background_data*</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># change indeces (drop month):</span>
+    <span class="n">covid_data_2020_12</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">covid_data_2020_12</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">droplevel</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">covid_data_2020_03</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">covid_data_2020_03</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">droplevel</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">covid_data_2020_04</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">covid_data_2020_04</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">droplevel</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">covid_data_2020_05</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">covid_data_2020_05</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">droplevel</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">covid_data_2020_12_select</span> <span class="o">=</span> <span class="n">covid_data_2020_12</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;vaccine_intention_jan&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;vaccine_intention_jul&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;covid_test_comply&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;happy_month&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nervous_month&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;depressed_month&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;calm_month&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;gloomy_month&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_childcare_open&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_cafe_open&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_transport_rules&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_no_visitors&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_curfew_high_risk&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_curfew_non_crucial&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_curfew&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_close_cc_some_schools&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_close_cc_all_schools&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">]</span>
+
+    <span class="n">covid_data_2020_05_select</span> <span class="o">=</span> <span class="n">covid_data_2020_05</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;concern_4w_bored&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_serious_ill&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_infect_others&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_loved_ill&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_food&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_health_care&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_fav_shop_bancrupt&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">]</span>
+
+    <span class="n">covid_data_2020_04_select</span> <span class="o">=</span> <span class="n">covid_data_2020_04</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;feeling_emptiness&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;enough_people_approach&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;enough_people_trust&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;enough_people_bond&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;miss_people_around&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;feel_let_down_often&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">]</span>
+
+    <span class="n">covid_data_2020_03_select</span> <span class="o">=</span> <span class="n">covid_data_2020_03</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;avoid_busy_places&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;avoid_public_places&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;maintain_distance&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;adjust_school_work&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;quarantine_symptoms&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;quarantine_no_symptoms&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">]</span>
+
+    <span class="n">background_data_select</span> <span class="o">=</span> <span class="n">background_data</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;age&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hh_members&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hh_children&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;location_urban&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;edu_4&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;gender&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;net_income&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">]</span>
+
+    <span class="n">background_data_select</span> <span class="o">=</span> <span class="n">background_data_select</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">background_data_select_expand</span> <span class="o">=</span> <span class="n">background_data_select</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">background_data_select</span><span class="o">.</span><span class="n">gender</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;gender&quot;</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
+        <span class="n">on</span><span class="o">=</span><span class="s2">&quot;personal_id&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">background_data_select_expand</span> <span class="o">=</span> <span class="n">background_data_select_expand</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;gender&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span>
+
+    <span class="n">background_data_cleaned</span> <span class="o">=</span> <span class="n">background_data_select_expand</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;poor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;moderate&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;good&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;very good&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;excellent&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;Not urban&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;Slightly urban&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;Moderately urban&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;Very urban&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;Extremely urban&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;primary&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;lower_secondary&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;upper_secondary&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;tertiary&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">political_data_2018</span> <span class="o">=</span> <span class="n">political_data</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;year == 2018&quot;</span><span class="p">)</span>
+    <span class="n">political_data_2018</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">political_data_2018</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">droplevel</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">political_data_select</span> <span class="o">=</span> <span class="n">political_data_2018</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;news_interest&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;political_interest&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;parties_not_care&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ppl_no_influence&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;politically_able&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;understand_pol_issues&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;how_rightwing&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">]</span>
+
+    <span class="n">political_data_select</span> <span class="o">=</span> <span class="n">political_data_select</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+    <span class="n">political_data_cleaned</span> <span class="o">=</span> <span class="n">political_data_select</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;not interested&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;fairly interested&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;very interested&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="c1"># cleaning:</span>
+    <span class="n">covid_data_2020_12_select</span> <span class="o">=</span> <span class="n">covid_data_2020_12_select</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+    <span class="n">covid_data_2020_12_cleaned</span> <span class="o">=</span> <span class="n">covid_data_2020_12_select</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;totally disagree&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;disagree&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;neither/nore&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;agree&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;totally agree&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;never&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;rarely&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;sometimes&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;often&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;mostly&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;constantly&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+            <span class="s2">&quot;too strict&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;rather too strict&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;just enough&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;rather flexible&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;too flexible&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;Helemaal mee oneens&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;Oneens&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;Niet oneens en niet eens&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;Eens&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;Helemaal mee eens&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">covid_data_2020_12_cleaned</span><span class="p">[</span><span class="s2">&quot;support_current_measures&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">covid_data_2020_12_cleaned</span><span class="p">[</span>
+        <span class="p">[</span><span class="s2">&quot;support_childcare_open&quot;</span><span class="p">,</span> <span class="s2">&quot;support_cafe_open&quot;</span><span class="p">,</span> <span class="s2">&quot;support_transport_rules&quot;</span><span class="p">]</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">covid_data_2020_12_cleaned</span><span class="p">[</span>
+        <span class="s2">&quot;support_possible_measures&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">covid_data_2020_12_cleaned</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;support_no_visitors&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_curfew_high_risk&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_curfew_non_crucial&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_curfew&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_close_cc_some_schools&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_close_cc_all_schools&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span>
+
+    <span class="n">covid_data_2020_12_cleaned</span> <span class="o">=</span> <span class="n">covid_data_2020_12_cleaned</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;support_childcare_open&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_cafe_open&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_transport_rules&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_no_visitors&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_curfew_high_risk&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_curfew_non_crucial&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_curfew&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_close_cc_some_schools&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;support_close_cc_all_schools&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">covid_data_2020_12_cleaned</span> <span class="o">=</span> <span class="n">covid_data_2020_12_cleaned</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+    <span class="n">covid_data_2020_03_select</span> <span class="o">=</span> <span class="n">covid_data_2020_03_select</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+    <span class="n">covid_data_2020_03_cleaned</span> <span class="o">=</span> <span class="n">covid_data_2020_03_select</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;1 no confidence at all&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;2&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;3&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;4&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;5 a lot of confidence&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;not effective at all&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;hardly effective&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;somewhat effective&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;effective&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;very effective&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;none at all&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;hardly any&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;some&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;a lot&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;a whole lot&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;never&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;once a week&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;several times a week&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;daily&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">covid_data_2020_03_cleaned</span><span class="p">[</span><span class="s2">&quot;compliance_measures&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">covid_data_2020_03_cleaned</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;avoid_busy_places&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;avoid_public_places&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;maintain_distance&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;adjust_school_work&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;quarantine_symptoms&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;quarantine_no_symptoms&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">covid_data_2020_03_cleaned</span> <span class="o">=</span> <span class="n">covid_data_2020_03_cleaned</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;avoid_busy_places&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;avoid_public_places&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;maintain_distance&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;adjust_school_work&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;quarantine_symptoms&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;quarantine_no_symptoms&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">covid_data_2020_04_cleaned</span> <span class="o">=</span> <span class="n">covid_data_2020_04_select</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;no&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;more or less&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;yes&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;much less&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;less&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;roughly equal&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;more&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;much more&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">covid_data_2020_04_cleaned</span><span class="p">[</span><span class="s2">&quot;loneliness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">covid_data_2020_04_cleaned</span><span class="p">[</span><span class="s2">&quot;feeling_emptiness&quot;</span><span class="p">]</span>
+        <span class="o">-</span> <span class="n">covid_data_2020_04_cleaned</span><span class="p">[</span><span class="s2">&quot;enough_people_approach&quot;</span><span class="p">]</span>
+        <span class="o">-</span> <span class="n">covid_data_2020_04_cleaned</span><span class="p">[</span><span class="s2">&quot;enough_people_trust&quot;</span><span class="p">]</span>
+        <span class="o">-</span> <span class="n">covid_data_2020_04_cleaned</span><span class="p">[</span><span class="s2">&quot;enough_people_bond&quot;</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">covid_data_2020_04_cleaned</span><span class="p">[</span><span class="s2">&quot;miss_people_around&quot;</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">covid_data_2020_04_cleaned</span><span class="p">[</span><span class="s2">&quot;feel_let_down_often&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">covid_data_2020_04_cleaned</span> <span class="o">=</span> <span class="n">covid_data_2020_04_cleaned</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;feeling_emptiness&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;enough_people_approach&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;enough_people_trust&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;enough_people_bond&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;miss_people_around&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;feel_let_down_often&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">covid_data_2020_05_select</span> <span class="o">=</span> <span class="n">covid_data_2020_05_select</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+    <span class="n">covid_data_2020_05_cleaned</span> <span class="o">=</span> <span class="n">covid_data_2020_05_select</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;too few&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;rather too few&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;right amount&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;rather too many&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;too many&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;1 not worried at all&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;2&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;3&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;4&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;5 very worried&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;much worse&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;a little worse&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;same&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;a little better&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;much better&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">covid_data_2020_05_cleaned</span><span class="p">[</span><span class="s2">&quot;concerns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">covid_data_2020_05_cleaned</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;concern_4w_bored&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_serious_ill&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_infect_others&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_loved_ill&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_food&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_health_care&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_fav_shop_bancrupt&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">covid_data_2020_05_cleaned</span> <span class="o">=</span> <span class="n">covid_data_2020_05_cleaned</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;concern_4w_bored&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_serious_ill&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_infect_others&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_loved_ill&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_food&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_health_care&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concern_4w_fav_shop_bancrupt&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">covid_data_2020_12_cleaned</span><span class="p">,</span>
+        <span class="n">covid_data_2020_03_cleaned</span><span class="p">,</span>
+        <span class="n">covid_data_2020_04_cleaned</span><span class="p">,</span>
+        <span class="n">covid_data_2020_05_cleaned</span><span class="p">,</span>
+        <span class="n">political_data_cleaned</span><span class="p">,</span>
+        <span class="n">background_data_cleaned</span><span class="p">,</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="merge_aux_subsets"><a class="viewcode-back" href="../../../data_management.html#src.data_management.task_lpa_process_aux_var_data.merge_aux_subsets">[docs]</a><span class="k">def</span> <span class="nf">merge_aux_subsets</span><span class="p">(</span>
+    <span class="n">covid_data_2020_12_cleaned</span><span class="p">,</span>
+    <span class="n">covid_data_2020_03_cleaned</span><span class="p">,</span>
+    <span class="n">covid_data_2020_04_cleaned</span><span class="p">,</span>
+    <span class="n">covid_data_2020_05_cleaned</span><span class="p">,</span>
+    <span class="n">background_data_cleaned</span><span class="p">,</span>
+    <span class="n">political_data_cleaned</span><span class="p">,</span>
+<span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Function to be called by `task_lpa_process_aux_var_data`. Reads in the cleaned dataframes passed</span>
+<span class="sd">    by *clean_aux_data* and merges them.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        covid_data_2020_12_cleaned (pd.DataFrame): cleaned version of *covid_data_2020_12*,</span>
+<span class="sd">            passed by function *clean_aux_data*</span>
+<span class="sd">        covid_data_2020_03_cleaned (pd.DataFrame): cleaned version of *covid_data_2020_03*,</span>
+<span class="sd">            passed by function *clean_aux_data*</span>
+<span class="sd">        covid_data_2020_04_cleaned (pd.DataFrame): cleaned version of *covid_data_2020_04*,</span>
+<span class="sd">            passed by function *clean_aux_data*</span>
+<span class="sd">        covid_data_2020_05_cleaned (pd.DataFrame): cleaned version of *covid_data_2020_05*,</span>
+<span class="sd">            passed by function *clean_aux_data*</span>
+<span class="sd">        background_data_cleaned (pd.DataFrame): cleaned version of *background_data*,</span>
+<span class="sd">            passed by function *clean_aux_data*</span>
+<span class="sd">        political_data_cleaned (pd.DataFrame): cleaned version of *political_data*,</span>
+<span class="sd">            passed by function *clean_aux_data*</span>
+
+
+<span class="sd">    Returns:</span>
+<span class="sd">        df_final_cleaned (pd.DataFrame): Merged df of the cleaned input dataframes</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dfs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">covid_data_2020_12_cleaned</span><span class="p">,</span>
+        <span class="n">covid_data_2020_03_cleaned</span><span class="p">,</span>
+        <span class="n">covid_data_2020_04_cleaned</span><span class="p">,</span>
+        <span class="n">covid_data_2020_05_cleaned</span><span class="p">,</span>
+        <span class="n">background_data_cleaned</span><span class="p">,</span>
+        <span class="n">political_data_cleaned</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">df_final</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span>
+        <span class="p">),</span>
+        <span class="n">dfs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">df_final_cleaned</span> <span class="o">=</span> <span class="n">df_final</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">df_final_cleaned</span></div>
+
+
+<span class="nd">@pytask</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">depends_on</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;covid_data_2020_04&quot;</span><span class="p">:</span> <span class="n">SRC</span> <span class="o">/</span> <span class="s2">&quot;original_data&quot;</span> <span class="o">/</span> <span class="s2">&quot;covid_data_2020_04.pickle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;covid_data_2020_05&quot;</span><span class="p">:</span> <span class="n">SRC</span> <span class="o">/</span> <span class="s2">&quot;original_data&quot;</span> <span class="o">/</span> <span class="s2">&quot;covid_data_2020_05.pickle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;covid_data_2020_12&quot;</span><span class="p">:</span> <span class="n">SRC</span> <span class="o">/</span> <span class="s2">&quot;original_data&quot;</span> <span class="o">/</span> <span class="s2">&quot;covid_data_2020_12.pickle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;covid_data_2020_03&quot;</span><span class="p">:</span> <span class="n">SRC</span> <span class="o">/</span> <span class="s2">&quot;original_data&quot;</span> <span class="o">/</span> <span class="s2">&quot;covid_data_2020_03.pickle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;background_data&quot;</span><span class="p">:</span> <span class="n">SRC</span> <span class="o">/</span> <span class="s2">&quot;original_data&quot;</span> <span class="o">/</span> <span class="s2">&quot;background_data_merged.pickle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;politics_values&quot;</span><span class="p">:</span> <span class="n">SRC</span> <span class="o">/</span> <span class="s2">&quot;original_data&quot;</span> <span class="o">/</span> <span class="s2">&quot;politics_values.pickle&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="nd">@pytask</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">produces</span><span class="p">(</span><span class="n">BLD</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;lpa_df_aux_vars.csv&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">task_lpa_create_partial_dfs</span><span class="p">(</span><span class="n">depends_on</span><span class="p">,</span> <span class="n">produces</span><span class="p">):</span>
+    <span class="n">covid_data_2020_12</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">depends_on</span><span class="p">[</span><span class="s2">&quot;covid_data_2020_12&quot;</span><span class="p">])</span>
+    <span class="n">covid_data_2020_03</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">depends_on</span><span class="p">[</span><span class="s2">&quot;covid_data_2020_03&quot;</span><span class="p">])</span>
+    <span class="n">covid_data_2020_04</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">depends_on</span><span class="p">[</span><span class="s2">&quot;covid_data_2020_04&quot;</span><span class="p">])</span>
+    <span class="n">covid_data_2020_05</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">depends_on</span><span class="p">[</span><span class="s2">&quot;covid_data_2020_05&quot;</span><span class="p">])</span>
+    <span class="n">political_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">depends_on</span><span class="p">[</span><span class="s2">&quot;politics_values&quot;</span><span class="p">])</span>
+    <span class="n">background_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">depends_on</span><span class="p">[</span><span class="s2">&quot;background_data&quot;</span><span class="p">])</span>
+    <span class="p">(</span>
+        <span class="n">covid_data_2020_12_cleaned</span><span class="p">,</span>
+        <span class="n">covid_data_2020_03_cleaned</span><span class="p">,</span>
+        <span class="n">covid_data_2020_04_cleaned</span><span class="p">,</span>
+        <span class="n">covid_data_2020_05_cleaned</span><span class="p">,</span>
+        <span class="n">political_data_cleaned</span><span class="p">,</span>
+        <span class="n">background_data_cleaned</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">=</span> <span class="n">clean_aux_data</span><span class="p">(</span>
+        <span class="n">covid_data_2020_12</span><span class="o">=</span><span class="n">covid_data_2020_12</span><span class="p">,</span>
+        <span class="n">covid_data_2020_03</span><span class="o">=</span><span class="n">covid_data_2020_03</span><span class="p">,</span>
+        <span class="n">covid_data_2020_04</span><span class="o">=</span><span class="n">covid_data_2020_04</span><span class="p">,</span>
+        <span class="n">covid_data_2020_05</span><span class="o">=</span><span class="n">covid_data_2020_05</span><span class="p">,</span>
+        <span class="n">background_data</span><span class="o">=</span><span class="n">background_data</span><span class="p">,</span>
+        <span class="n">political_data</span><span class="o">=</span><span class="n">political_data</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">df_final_cleaned</span> <span class="o">=</span> <span class="n">merge_aux_subsets</span><span class="p">(</span>
+        <span class="n">covid_data_2020_12_cleaned</span><span class="o">=</span><span class="n">covid_data_2020_12_cleaned</span><span class="p">,</span>
+        <span class="n">covid_data_2020_03_cleaned</span><span class="o">=</span><span class="n">covid_data_2020_03_cleaned</span><span class="p">,</span>
+        <span class="n">covid_data_2020_04_cleaned</span><span class="o">=</span><span class="n">covid_data_2020_04_cleaned</span><span class="p">,</span>
+        <span class="n">covid_data_2020_05_cleaned</span><span class="o">=</span><span class="n">covid_data_2020_05_cleaned</span><span class="p">,</span>
+        <span class="n">background_data_cleaned</span><span class="o">=</span><span class="n">background_data_cleaned</span><span class="p">,</span>
+        <span class="n">political_data_cleaned</span><span class="o">=</span><span class="n">political_data_cleaned</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">df_final_cleaned</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">produces</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021-, Josef Nagelschmidt.
+
+    </p>
+  </div>
+
+
+
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+
+
+
+
+
+</body>
+</html>

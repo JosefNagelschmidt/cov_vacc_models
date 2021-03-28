@@ -1,0 +1,424 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Data management &mdash; Covid vaccination models  documentation</title>
+
+
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+
+
+
+
+
+
+
+
+
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Analysis" href="analysis.html" />
+    <link rel="prev" title="Original data" href="original_data.html" />
+</head>
+
+<body class="wy-body-for-nav">
+
+
+  <div class="wy-grid-for-nav">
+
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+            <a href="index.html" class="icon icon-home"> Covid vaccination models
+
+
+
+          </a>
+
+
+
+
+
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+
+        </div>
+
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+
+
+
+
+
+
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="original_data.html">Original data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#latent-profile-analysis-data-preprocessing">Latent profile analysis data preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sparse-modelling-adaptive-lasso-data-preprocessing">Sparse modelling (adaptive lasso) data preprocessing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="final.html">Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_code.html">Model code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_specs.html">Model specifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+
+
+
+        </div>
+
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+
+      <nav class="wy-nav-top" aria-label="top navigation">
+
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Covid vaccination models</a>
+
+      </nav>
+
+
+      <div class="wy-nav-content">
+
+        <div class="rst-content">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+
+      <li>Data management</li>
+
+
+      <li class="wy-breadcrumbs-aside">
+
+
+            <a href="_sources/data_management.rst.txt" rel="nofollow"> View page source</a>
+
+
+      </li>
+
+  </ul>
+
+
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <div class="section" id="data-management">
+<span id="id1"></span><h1>Data management<a class="headerlink" href="#data-management" title="Permalink to this headline">¶</a></h1>
+<p>Documentation of the code in <em>src/data_management</em>.</p>
+<div class="section" id="latent-profile-analysis-data-preprocessing">
+<h2>Latent profile analysis data preprocessing<a class="headerlink" href="#latent-profile-analysis-data-preprocessing" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><cite>task_lpa_process_aux_var_data.py</cite> collects data from various raw data sources and saves the cleaned and merged resulting dataframe into a csv file. The dataframe contains all auxiliary variables used in the second stage of the latent profile analysis. These auxiliary variables stay the same for all sets of first-stage models under consideration.</p></li>
+<li><p><cite>task_lpa_create_partial_dfs.py</cite> creates cleaned dataframes of sets of variables which are specified in the <cite>src/model_specs</cite> directory. These are the first-stage sets of variables for gaussian mixture models (i.e. latent profiles).</p></li>
+<li><p><cite>task_lpa_get_optimal_params.py</cite> reads in tables of performance metrics for each gaussian mixture model generated by the variable sets in the <cite>model_specs</cite>, which have been calculated by <cite>src/analysis/task_lpa_analysis.py</cite>. It then extracts the best performing model parameters for each set of variables into <cite>src/model_specs/lpa_optimal_params_set_x.json</cite>.</p></li>
+</ul>
+<span class="target" id="module-src.data_management.task_lpa_process_aux_var_data"></span><dl class="py function">
+<dt id="src.data_management.task_lpa_process_aux_var_data.clean_aux_data">
+<code class="sig-name descname"><span class="pre">clean_aux_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covid_data_2020_12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covid_data_2020_03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covid_data_2020_04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covid_data_2020_05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">political_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/data_management/task_lpa_process_aux_var_data.html#clean_aux_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.data_management.task_lpa_process_aux_var_data.clean_aux_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to be called by <cite>task_lpa_process_aux_var_data</cite>. Cleans and then returns the input data files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>covid_data_2020_12</strong> (<em>pd.DataFrame</em>) – the dataframe from the pickle file
+named <em>covid_data_2020_12.pickle</em>  (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>covid_data_2020_03</strong> (<em>pd.DataFrame</em>) – the dataframe from the pickle file
+named <em>covid_data_2020_03.pickle</em>  (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>covid_data_2020_04</strong> (<em>pd.DataFrame</em>) – the dataframe from the pickle file
+named <em>covid_data_2020_04.pickle</em>  (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>covid_data_2020_05</strong> (<em>pd.DataFrame</em>) – the dataframe from the pickle file
+named <em>covid_data_2020_05.pickle</em>  (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>background_data</strong> (<em>pd.DataFrame</em>) – the dataframe from the pickle file
+named <em>background_data_merged.pickle</em>  (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>political_data</strong> (<em>pd.DataFrame</em>) – the dataframe from the pickle file
+named <em>politics_values.pickle</em> (preprocessed data from a LISS questionnaire)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>list containing:</p>
+<blockquote>
+<div><p><strong>covid_data_2020_12_cleaned</strong> (<em>pd.DataFrame</em>): cleaned version of <em>covid_data_2020_12</em></p>
+<p><strong>covid_data_2020_03_cleaned</strong> (<em>pd.DataFrame</em>): cleaned version of <em>covid_data_2020_03</em></p>
+<p><strong>covid_data_2020_04_cleaned</strong> (<em>pd.DataFrame</em>): cleaned version of <em>covid_data_2020_04</em></p>
+<p><strong>covid_data_2020_05_cleaned</strong> (<em>pd.DataFrame</em>): cleaned version of <em>covid_data_2020_05</em></p>
+<p><strong>political_data_cleaned</strong> (<em>pd.DataFrame</em>): cleaned version of <em>political_data</em></p>
+<p><strong>background_data_cleaned</strong> (<em>pd.DataFrame</em>): cleaned version of <em>background_data</em></p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.data_management.task_lpa_process_aux_var_data.merge_aux_subsets">
+<code class="sig-name descname"><span class="pre">merge_aux_subsets</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covid_data_2020_12_cleaned</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covid_data_2020_03_cleaned</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covid_data_2020_04_cleaned</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covid_data_2020_05_cleaned</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_data_cleaned</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">political_data_cleaned</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/data_management/task_lpa_process_aux_var_data.html#merge_aux_subsets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.data_management.task_lpa_process_aux_var_data.merge_aux_subsets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to be called by <cite>task_lpa_process_aux_var_data</cite>. Reads in the cleaned dataframes passed
+by <em>clean_aux_data</em> and merges them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>covid_data_2020_12_cleaned</strong> (<em>pd.DataFrame</em>) – cleaned version of <em>covid_data_2020_12</em>,
+passed by function <em>clean_aux_data</em></p></li>
+<li><p><strong>covid_data_2020_03_cleaned</strong> (<em>pd.DataFrame</em>) – cleaned version of <em>covid_data_2020_03</em>,
+passed by function <em>clean_aux_data</em></p></li>
+<li><p><strong>covid_data_2020_04_cleaned</strong> (<em>pd.DataFrame</em>) – cleaned version of <em>covid_data_2020_04</em>,
+passed by function <em>clean_aux_data</em></p></li>
+<li><p><strong>covid_data_2020_05_cleaned</strong> (<em>pd.DataFrame</em>) – cleaned version of <em>covid_data_2020_05</em>,
+passed by function <em>clean_aux_data</em></p></li>
+<li><p><strong>background_data_cleaned</strong> (<em>pd.DataFrame</em>) – cleaned version of <em>background_data</em>,
+passed by function <em>clean_aux_data</em></p></li>
+<li><p><strong>political_data_cleaned</strong> (<em>pd.DataFrame</em>) – cleaned version of <em>political_data</em>,
+passed by function <em>clean_aux_data</em></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Merged df of the cleaned input dataframes</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>df_final_cleaned (pd.DataFrame)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-src.data_management.task_lpa_create_partial_dfs"></span><dl class="py function">
+<dt id="src.data_management.task_lpa_create_partial_dfs.clean_data">
+<code class="sig-name descname"><span class="pre">clean_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covid_data_2020_12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covid_data_2020_03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">political_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/data_management/task_lpa_create_partial_dfs.html#clean_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.data_management.task_lpa_create_partial_dfs.clean_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to be called by <cite>task_lpa_create_partial_dfs</cite>. Cleans and then returns the input data files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>covid_data_2020_12</strong> (<em>pd.DataFrame</em>) – the dataframe from the pickle
+file named <em>covid_data_2020_12.pickle</em>  (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>covid_data_2020_03</strong> (<em>pd.DataFrame</em>) – the dataframe from the pickle
+file named <em>covid_data_2020_03.pickle</em>  (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>political_data</strong> (<em>pd.DataFrame</em>) – the dataframe from the pickle
+file named <em>politics_values.pickle</em> (preprocessed data from a LISS questionnaire)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>list containing:</p>
+<blockquote>
+<div><p><strong>covid_data_2020_12_cleaned</strong> (<em>pd.DataFrame</em>): cleaned version of <em>covid_data_2020_12</em></p>
+<p><strong>covid_data_2020_03_cleaned</strong> (<em>pd.DataFrame</em>): cleaned version of <em>covid_data_2020_03</em></p>
+<p><strong>political_data_select</strong> (<em>pd.DataFrame</em>): cleaned version of <em>political_data</em></p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.data_management.task_lpa_create_partial_dfs.merge_subsets">
+<code class="sig-name descname"><span class="pre">merge_subsets</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covid_data_2020_12_cleaned</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covid_data_2020_03_cleaned</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">political_data_select</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_set</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/data_management/task_lpa_create_partial_dfs.html#merge_subsets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.data_management.task_lpa_create_partial_dfs.merge_subsets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to be called by <cite>task_lpa_create_partial_dfs</cite>. Reads in pre-specified columns of
+the input dataframes (as defined by <em>var_set</em>) and merges them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>covid_data_2020_12_cleaned</strong> (<em>pd.DataFrame</em>) – cleaned version
+of <em>covid_data_2020_12</em>, passed by function <em>clean_data</em></p></li>
+<li><p><strong>covid_data_2020_03_cleaned</strong> (<em>pd.DataFrame</em>) – cleaned version
+of <em>covid_data_2020_03</em>, passed by function <em>clean_data</em></p></li>
+<li><p><strong>political_data_select</strong> (<em>pd.DataFrame</em>) – cleaned version
+of <em>political_data</em>, passed by function <em>clean_data</em></p></li>
+<li><p><strong>var_set</strong> (<em>dict</em>) – dict containing a list for each of the three input dataframes,
+which in turn contains names (<em>str</em>) of the relevant column names</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Merged df of the pre-specified columns of the input dataframes</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>df_final_cleaned (pd.DataFrame)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.data_management.task_lpa_create_partial_dfs.scaler">
+<code class="sig-name descname"><span class="pre">scaler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/data_management/task_lpa_create_partial_dfs.html#scaler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.data_management.task_lpa_create_partial_dfs.scaler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function that rescales a value <em>x</em> to a certain range, as specified by the max- and min
+values of a column in the dataframe from which <em>x</em> originates. This is useful in latent profile analysis and subsequent steps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>) – element that is to be rescaled to a different range</p></li>
+<li><p><strong>lower</strong> (<em>float</em>) – lower bound of the new range</p></li>
+<li><p><strong>upper</strong> (<em>float</em>) – upper bound of the new range</p></li>
+<li><p><strong>df</strong> (<em>pd.Dataframe</em>) – df containing the column from which <em>x</em> originated</p></li>
+<li><p><strong>column_name</strong> (<em>str</em>) – column name in <em>df</em> from which <em>x</em> is drawn</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>rescaled value of <em>x</em></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-src.data_management.task_lpa_get_optimal_params"></span></div>
+<div class="section" id="sparse-modelling-adaptive-lasso-data-preprocessing">
+<h2>Sparse modelling (adaptive lasso) data preprocessing<a class="headerlink" href="#sparse-modelling-adaptive-lasso-data-preprocessing" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><cite>task_process_sparse_modelling_real_data.py</cite> collects data from various raw data sources and saves the cleaned and merged resulting dataframe into csv files. The four resulting files differ in whether <em>political data</em> (from the LISS dataset <cite>politics_values.pickle</cite>) or <em>profession data</em> (from the LISS dataset <cite>background_data_merged.pickle</cite>) (or both) were added.</p></li>
+</ul>
+<span class="target" id="module-src.data_management.task_process_sparse_modelling_real_data"></span><dl class="py function">
+<dt id="src.data_management.task_process_sparse_modelling_real_data.clean_sparse_data">
+<code class="sig-name descname"><span class="pre">clean_sparse_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covid_data_2020_12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covid_data_2020_03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covid_data_2020_04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covid_data_2020_05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covid_data_2020_06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covid_data_2020_09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">political_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_profession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_political</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/data_management/task_process_sparse_modelling_real_data.html#clean_sparse_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.data_management.task_process_sparse_modelling_real_data.clean_sparse_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to be called by <cite>task_process_sparse_modelling_real_data</cite>. Cleans and then returns subsets of the input data files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>covid_data_2020_12</strong> (<em>pd.DataFrame</em>) – the df from the file
+named <em>covid_data_2020_12.pickle</em> (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>covid_data_2020_03</strong> (<em>pd.DataFrame</em>) – the df from the file
+named <em>covid_data_2020_03.pickle</em> (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>covid_data_2020_04</strong> (<em>pd.DataFrame</em>) – the df from the file
+named <em>covid_data_2020_04.pickle</em> (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>covid_data_2020_05</strong> (<em>pd.DataFrame</em>) – the df from the file
+named <em>covid_data_2020_05.pickle</em> (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>covid_data_2020_06</strong> (<em>pd.DataFrame</em>) – the df from the file
+named <em>covid_data_2020_06.pickle</em> (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>covid_data_2020_09</strong> (<em>pd.DataFrame</em>) – the df from the file
+named <em>covid_data_2020_09.pickle</em> (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>background_data</strong> (<em>pd.DataFrame</em>) – the df from the file
+named <em>background_data_merged.pickle</em> (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>political_data</strong> (<em>pd.DataFrame</em>) – the df from the file
+named <em>politics_values.pickle</em> (preprocessed data from a LISS questionnaire)</p></li>
+<li><p><strong>add_profession</strong> (<em>str</em>) – <em>yes</em>, if the variable <em>profession</em> from the LISS
+dataset <em>background_data_merged.pickle</em> should be used; <em>no</em> if not</p></li>
+<li><p><strong>add_political</strong> (<em>str</em>) – <em>yes</em>, if the variables (<em>news_interest</em>,*political_interest*,*parties_not_care*,
+<em>ppl_no_influence</em>,*politically_able*,*understand_pol_issues*,*how_rightwing*) from the
+LISS dataset <em>politics_values.pickle</em> should be used; <em>no</em> if not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the resulting df after cleaning each of the input dfs and merging them</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>df_final_cleaned (pd.DataFrame)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="analysis.html" class="btn btn-neutral float-right" title="Analysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="original_data.html" class="btn btn-neutral float-left" title="Original data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021-, Josef Nagelschmidt.
+
+    </p>
+  </div>
+
+
+
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+
+
+
+
+
+</body>
+</html>
