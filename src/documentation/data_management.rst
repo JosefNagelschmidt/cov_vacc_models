@@ -28,7 +28,7 @@ Latent profile analysis data preprocessing
 Sparse modelling (adaptive lasso) data preprocessing
 ====================================================
 
-- `task_lpa_protask_process_sparse_modelling_real_data.py` collects data from various raw data sources and saves the cleaned and merged resulting dataframe into csv files. The four resulting files differ in whether *political data* (from the LISS dataset `politics_values.pickle`) or *profession data* (from the LISS dataset `background_data_merged.pickle`) (or both) were added.
+- `task_process_sparse_modelling_real_data.py` collects data from various raw data sources and saves the cleaned and merged resulting dataframe into csv files. The four resulting files differ in whether *political data* (from the LISS dataset `politics_values.pickle`) or *profession data* (from the LISS dataset `background_data_merged.pickle`) (or both) were added.
 
 
 .. automodule:: src.data_management.task_process_sparse_modelling_real_data

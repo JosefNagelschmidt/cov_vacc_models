@@ -4,7 +4,7 @@
 Model specifications
 ********************
 
-The directory *src.model_specs* contains `JSON <http://www.json.org/>`_ files with model specifications.
+The directory *src/model_specs* contains `JSON <http://www.json.org/>`_ files with model specifications.
 Currently, all files are specifications for the latent profile analysis (LPA) in the real data part of the project (EPP course).
 
 

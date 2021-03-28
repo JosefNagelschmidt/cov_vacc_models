@@ -4,5 +4,5 @@
 References
 **********
 
-.. bibliography:: ../paper/refs.bib
+.. bibliography:: refs.bib
    :style: plain

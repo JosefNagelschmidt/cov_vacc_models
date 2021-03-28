@@ -57,11 +57,11 @@ def task_adaptive_lasso_real_data(case, depends_on, produces):
         X=X_numpy,
         y=y_numpy,
         first_stage="OLS",
-        intercept=False,
+        intercept=True,
         cross_valid_split=False,
     )
     df_clean, intercept_val = interpretable_confidence_intervals(
-        adaptive_lasso_tuned_obj=res, intercept=False
+        adaptive_lasso_tuned_obj=res, intercept=True
     )
     df_clean["variable_name"] = list(X)
     df_clean["intercept_value"] = intercept_val

@@ -4,7 +4,7 @@
 Results
 ********
 
-Documentation of the code in *src.final*.
+Documentation of the code in *src/final*.
 
 
 Latent profile analysis

@@ -4,7 +4,7 @@
 Analysis
 ********
 
-Documentation of the code in *src.analysis*.
+Documentation of the code in *src/analysis*.
 
 
 Latent profile analysis

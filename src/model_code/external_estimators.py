@@ -159,7 +159,7 @@ def sk_learn_lasso(X, y, intercept=True, lamda_path=None):
     y_std = (y - y_mean) / y_std
 
     if lamda_path is None:
-        path = get_lamda_path_numba(X=X_std, y=y_std)
+        path = get_lamda_path_numba(X_std=X_std, y_std=y_std)
     else:
         path = lamda_path
 
