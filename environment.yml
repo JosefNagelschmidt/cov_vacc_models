@@ -17,6 +17,9 @@ dependencies:
   - pytask-r>=0.0.6
   - scikit-learn
   - statsmodels
+  - seaborn
+  - ipython
+  - scipy
 
   - pytest
   - pytest-cov
